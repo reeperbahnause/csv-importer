@@ -1,6 +1,6 @@
 <?php
 /**
- * StartController.php
+ * UploadedFiles.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,35 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Import;
+namespace App\Http\Middleware;
 
-
-use App\Http\Controllers\Controller;
-use App\Http\Middleware\UploadedFiles;
+use App\Services\Session\Constants;
+use Closure;
+use Illuminate\Http\Request;
 
 /**
- * Class StartController
+ * Class UploadedFiles
  */
-class StartController extends Controller
+class UploadedFiles
 {
     /**
-     * StartController constructor.
+     * Check if the user has already uploaded files in this session. If so, continue to configuration.
+     *
+     * @param Request $request
+     * @param Closure $next
+     *
+     * @return mixed
+     *
      */
-    public function __construct()
+    public function handle(Request $request, Closure $next)
     {
-        parent::__construct();
-        app('view')->share('pageTitle', 'Import');
-        $this->middleware(UploadedFiles::class);
-    }
+        if (session()->has(Constants::UPLOAD_CSV_FILE)) {
+            return redirect()->route('import.configure.index');
+        }
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
-    {
-        $mainTitle = 'Import routine';
-        $subTitle  = 'Start page and instructions';
-
-        return view('import.index', compact('mainTitle', 'subTitle'));
+        return $next($request);
     }
 }

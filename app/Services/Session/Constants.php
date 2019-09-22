@@ -1,6 +1,6 @@
 <?php
 /**
- * StartController.php
+ * Constants.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,35 +20,21 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Import;
-
-
-use App\Http\Controllers\Controller;
-use App\Http\Middleware\UploadedFiles;
+namespace App\Services\Session;
 
 /**
- * Class StartController
+ * Class Constants
  */
-class StartController extends Controller
+class Constants
 {
-    /**
-     * StartController constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        app('view')->share('pageTitle', 'Import');
-        $this->middleware(UploadedFiles::class);
-    }
+    /** @var string  */
+    public const UPLOAD_CSV_FILE = 'csv_file_path';
+    /** @var string  */
+    public const UPLOAD_CONFIG_FILE = 'config_file_path';
+    /** @var string  */
+    public const CONFIGURATION = 'configuration';
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
-    {
-        $mainTitle = 'Import routine';
-        $subTitle  = 'Start page and instructions';
+    /** @var string  */
+    public const CONFIG_COMPLETE_INDICATOR = 'config_complete';
 
-        return view('import.index', compact('mainTitle', 'subTitle'));
-    }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * StartController.php
+ * ConfigFileProcessor.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,35 +20,27 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Import;
+namespace App\Services\CSV\Configuration;
 
 
-use App\Http\Controllers\Controller;
-use App\Http\Middleware\UploadedFiles;
+use App\Services\Storage\StorageService;
 
-/**
- * Class StartController
- */
-class StartController extends Controller
+class ConfigFileProcessor
 {
     /**
-     * StartController constructor.
+     * Input (the content of) a configuration file and this little script will convert it to a compatible array.
+     *
+     * @param string $fileName
+     *
+     * @return Configuration
      */
-    public function __construct()
+    public static function convertConfigFile(string $fileName): Configuration
     {
-        parent::__construct();
-        app('view')->share('pageTitle', 'Import');
-        $this->middleware(UploadedFiles::class);
+        $content = StorageService::getContent($fileName);
+        $json    = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        return Configuration::fromClassic($json);
+
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
-    {
-        $mainTitle = 'Import routine';
-        $subTitle  = 'Start page and instructions';
-
-        return view('import.index', compact('mainTitle', 'subTitle'));
-    }
 }
