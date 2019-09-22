@@ -1,6 +1,6 @@
 <?php
 /**
- * Constants.php
+ * RolesPostRequest.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,22 +20,42 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\Session;
+namespace App\Http\Request;
+
 
 /**
- * Class Constants
+ * Class RolesPostRequest
  */
-class Constants
+class RolesPostRequest extends Request
 {
-    /** @var string  */
-    public const UPLOAD_CSV_FILE = 'csv_file_path';
-    /** @var string  */
-    public const UPLOAD_CONFIG_FILE = 'config_file_path';
-    /** @var string  */
-    public const CONFIGURATION = 'configuration';
-    /** @var string  */
-    public const CONFIG_COMPLETE_INDICATOR = 'config_complete';
-    /** @var string string */
-    public const ROLES_COMPLETE_INDICATOR = 'role_config_complete';
 
+    /**
+     * Verify the request.
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function getAll(): array
+    {
+        return [
+            'roles' => $this->get('roles') ?? [],
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function rules(): array
+    {
+        $keys = implode(',', array_keys(config('csv_importer.import_roles')));
+
+        return [
+            'roles.*' => sprintf('required|in:%s', $keys),
+        ];
+    }
 }
