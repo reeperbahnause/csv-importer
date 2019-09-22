@@ -1,6 +1,6 @@
 <?php
 /**
- * ConfigFileProcessor.php
+ * RoleController.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,29 +20,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\Configuration;
+namespace App\Http\Controllers\Import;
 
 
-use App\Services\Storage\StorageService;
-use Log;
+use App\Http\Controllers\Controller;
 
-class ConfigFileProcessor
+/**
+ * Class RoleController
+ */
+class RoleController extends Controller
 {
-    /**
-     * Input (the content of) a configuration file and this little script will convert it to a compatible array.
-     *
-     * @param string $fileName
-     *
-     * @return Configuration
-     */
-    public static function convertConfigFile(string $fileName): Configuration
-    {
-        Log::debug('Now in ConfigFileProcessor::convertConfigFile');
-        $content = StorageService::getContent($fileName);
-        $json    = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-
-        return Configuration::fromClassic($json);
-
-    }
 
 }

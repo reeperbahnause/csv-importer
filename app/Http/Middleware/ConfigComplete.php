@@ -1,6 +1,6 @@
 <?php
 /**
- * ConfigFileProcessor.php
+ * ConfigComplete.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,29 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\Configuration;
+namespace App\Http\Middleware;
 
+use App\Services\Session\Constants;
+use Closure;
+use Illuminate\Http\Request;
 
-use App\Services\Storage\StorageService;
-use Log;
-
-class ConfigFileProcessor
+/**
+ * Class ConfigComplete
+ */
+class ConfigComplete
 {
     /**
-     * Input (the content of) a configuration file and this little script will convert it to a compatible array.
+     * Check if the user has already uploaded files in this session. If so, continue to configuration.
      *
-     * @param string $fileName
+     * @param Request $request
+     * @param Closure $next
      *
-     * @return Configuration
+     * @return mixed
+     *
      */
-    public static function convertConfigFile(string $fileName): Configuration
+    public function handle(Request $request, Closure $next)
     {
-        Log::debug('Now in ConfigFileProcessor::convertConfigFile');
-        $content = StorageService::getContent($fileName);
-        $json    = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        if (session()->has(Constants::CONFIG_COMPLETE_INDICATOR) && true === session()->get(Constants::CONFIG_COMPLETE_INDICATOR)) {
+            return redirect()->route('import.roles.index');
+        }
 
-        return Configuration::fromClassic($json);
-
+        return $next($request);
     }
-
 }
