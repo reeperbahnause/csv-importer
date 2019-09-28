@@ -1,6 +1,6 @@
 <?php
 /**
- * GetAccountsRequest.php
+ * GetCategoriesRequest.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -25,38 +25,25 @@ namespace App\Services\FireflyIIIApi\Request;
 
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiHttpException;
-use App\Services\FireflyIIIApi\Response\GetAccountsResponse;
+use App\Services\FireflyIIIApi\Response\GetCategoriesResponse;
 use App\Services\FireflyIIIApi\Response\Response;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
- * Class GetAccountsRequest
+ * Class GetCategoriesRequest
  */
-class GetAccountsRequest extends Request
+class GetCategoriesRequest extends Request
 {
-    /** @var string */
-    public const ASSET = 'asset';
-    /** @var string  */
-    public const LIABILITIES = 'liabilities';
-
-    /** @var string  */
-    public const ALL = 'all';
-
-    /** @var string */
-    private $type;
-
-
     /**
-     * GetAccountsRequest constructor.
+     * GetCategoriesRequest constructor.
      */
     public function __construct()
     {
         $url        = config('csv_importer.uri');
         $token      = config('csv_importer.access_token');
-        $this->type = 'all';
         $this->setBase($url);
         $this->setToken($token);
-        $this->setUri('accounts');
+        $this->setUri('categories');
     }
 
     /**
@@ -70,28 +57,8 @@ class GetAccountsRequest extends Request
         } catch (ApiException|GuzzleException $e) {
             throw new ApiHttpException($e->getMessage());
         }
-        $response = new GetAccountsResponse($data['data']);
+        $response = new GetCategoriesResponse($data['data']);
 
         return $response;
     }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     */
-    public function setType(string $type): void
-    {
-        $this->type = $type;
-        $this->setParameters(['type' => $type]);
-    }
-
-
-
 }

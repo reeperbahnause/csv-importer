@@ -1,6 +1,6 @@
 <?php
 /**
- * Account.php
+ * Categories.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,46 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\FireflyIIIApi\Model;
+namespace App\Services\CSV\Mapper;
+
+use App\Services\FireflyIIIApi\Model\Category;
+use App\Services\FireflyIIIApi\Request\GetCategoriesRequest;
 
 /**
- * Class Account
+ * Class Categories
  */
-class Account
+class Categories implements MapperInterface
 {
-    /** @var int */
-    public $id;
-    /** @var string */
-    public $name;
-    /** @var string */
-    public $type;
-    /** @var string */
-    public $iban;
 
     /**
-     * Account constructor.
-     */
-    protected function __construct()
-    {
-
-    }
-
-    /**
-     * @param array $array
+     * Get map of objects.
      *
-     * @return static
+     * @return array
      */
-    public static function fromArray(array $array): self
+    public function getMap(): array
     {
-        $account = new Account;
+        $result   = [];
+        $request  = new GetCategoriesRequest;
+        $response = $request->get();
+        /** @var Category $category */
+        foreach ($response as $category) {
+            $result[$category->id] = sprintf('%s', $category->name);
+        }
 
-        $account->id   = (int)$array['id'];
-        $account->name = $array['attributes']['name'];
-        $account->type = $array['attributes']['type'];
-        $account->iban = $array['attributes']['iban'];
-
-        return $account;
-
+        return $result;
     }
-
 }

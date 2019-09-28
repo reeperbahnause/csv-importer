@@ -1,6 +1,6 @@
 <?php
 /**
- * Account.php
+ * Budgets.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,46 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\FireflyIIIApi\Model;
+namespace App\Services\CSV\Mapper;
+
+use App\Services\FireflyIIIApi\Model\Budget;
+use App\Services\FireflyIIIApi\Request\GetBudgetsRequest;
 
 /**
- * Class Account
+ * Class Budgets
  */
-class Account
+class Budgets implements MapperInterface
 {
-    /** @var int */
-    public $id;
-    /** @var string */
-    public $name;
-    /** @var string */
-    public $type;
-    /** @var string */
-    public $iban;
 
     /**
-     * Account constructor.
-     */
-    protected function __construct()
-    {
-
-    }
-
-    /**
-     * @param array $array
+     * Get map of objects.
      *
-     * @return static
+     * @return array
      */
-    public static function fromArray(array $array): self
+    public function getMap(): array
     {
-        $account = new Account;
+        $result   = [];
+        $request  = new GetBudgetsRequest;
+        $response = $request->get();
+        /** @var Budget $budget */
+        foreach ($response as $budget) {
+            $result[$budget->id] = sprintf('%s', $budget->name);
+        }
 
-        $account->id   = (int)$array['id'];
-        $account->name = $array['attributes']['name'];
-        $account->type = $array['attributes']['type'];
-        $account->iban = $array['attributes']['iban'];
-
-        return $account;
-
+        return $result;
     }
-
 }

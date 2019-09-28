@@ -1,6 +1,6 @@
 <?php
 /**
- * Account.php
+ * Bill.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -23,18 +23,17 @@
 namespace App\Services\FireflyIIIApi\Model;
 
 /**
- * Class Account
+ * Class Bill
  */
-class Account
+class Bill
 {
     /** @var int */
     public $id;
     /** @var string */
     public $name;
+
     /** @var string */
-    public $type;
-    /** @var string */
-    public $iban;
+    public $repeat_freq;
 
     /**
      * Account constructor.
@@ -51,14 +50,13 @@ class Account
      */
     public static function fromArray(array $array): self
     {
-        $account = new Account;
+        $bill = new Bill;
 
-        $account->id   = (int)$array['id'];
-        $account->name = $array['attributes']['name'];
-        $account->type = $array['attributes']['type'];
-        $account->iban = $array['attributes']['iban'];
+        $bill->id          = (int)$array['id'];
+        $bill->name        = $array['attributes']['name'];
+        $bill->repeat_freq = $array['attributes']['repeat_freq'];
 
-        return $account;
+        return $bill;
 
     }
 

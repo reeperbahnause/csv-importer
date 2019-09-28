@@ -1,6 +1,6 @@
 <?php
 /**
- * Account.php
+ * RolesComplete.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,46 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\FireflyIIIApi\Model;
+namespace App\Http\Middleware;
+
+use App\Services\Session\Constants;
+use Closure;
+use Illuminate\Http\Request;
 
 /**
- * Class Account
+ * Class RolesComplete
  */
-class Account
+class RolesComplete
 {
-    /** @var int */
-    public $id;
-    /** @var string */
-    public $name;
-    /** @var string */
-    public $type;
-    /** @var string */
-    public $iban;
-
     /**
-     * Account constructor.
-     */
-    protected function __construct()
-    {
-
-    }
-
-    /**
-     * @param array $array
+     * Check if the user has already uploaded files in this session. If so, continue to configuration.
      *
-     * @return static
+     * @param Request $request
+     * @param Closure $next
+     *
+     * @return mixed
+     *
      */
-    public static function fromArray(array $array): self
+    public function handle(Request $request, Closure $next)
     {
-        $account = new Account;
+        if (session()->has(Constants::ROLES_COMPLETE_INDICATOR) && true === session()->get(Constants::ROLES_COMPLETE_INDICATOR)) {
+            return redirect()->route('import.mapping.index');
+        }
 
-        $account->id   = (int)$array['id'];
-        $account->name = $array['attributes']['name'];
-        $account->type = $array['attributes']['type'];
-        $account->iban = $array['attributes']['iban'];
-
-        return $account;
-
+        return $next($request);
     }
-
 }

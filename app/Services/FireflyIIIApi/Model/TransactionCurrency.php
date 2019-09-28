@@ -1,6 +1,6 @@
 <?php
 /**
- * Account.php
+ * TransactionCurrency.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -23,18 +23,16 @@
 namespace App\Services\FireflyIIIApi\Model;
 
 /**
- * Class Account
+ * Class TransactionCurrency
  */
-class Account
+class TransactionCurrency
 {
+    /** @var string */
+    public $code;
     /** @var int */
     public $id;
     /** @var string */
     public $name;
-    /** @var string */
-    public $type;
-    /** @var string */
-    public $iban;
 
     /**
      * Account constructor.
@@ -51,14 +49,13 @@ class Account
      */
     public static function fromArray(array $array): self
     {
-        $account = new Account;
+        $currency = new TransactionCurrency;
 
-        $account->id   = (int)$array['id'];
-        $account->name = $array['attributes']['name'];
-        $account->type = $array['attributes']['type'];
-        $account->iban = $array['attributes']['iban'];
+        $currency->id   = (int)$array['id'];
+        $currency->name = $array['attributes']['name'];
+        $currency->code = $array['attributes']['code'];
 
-        return $account;
+        return $currency;
 
     }
 

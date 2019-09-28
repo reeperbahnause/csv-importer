@@ -1,6 +1,6 @@
 <?php
 /**
- * Account.php
+ * MappingComplete.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,46 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\FireflyIIIApi\Model;
+namespace App\Http\Middleware;
+
+use App\Services\Session\Constants;
+use Closure;
+use Illuminate\Http\Request;
 
 /**
- * Class Account
+ * Class MappingComplete
  */
-class Account
+class MappingComplete
 {
-    /** @var int */
-    public $id;
-    /** @var string */
-    public $name;
-    /** @var string */
-    public $type;
-    /** @var string */
-    public $iban;
-
     /**
-     * Account constructor.
-     */
-    protected function __construct()
-    {
-
-    }
-
-    /**
-     * @param array $array
+     * Check if the user has already set the mapping in this session. If so, continue to configuration.
      *
-     * @return static
+     * @param Request $request
+     * @param Closure $next
+     *
+     * @return mixed
+     *
      */
-    public static function fromArray(array $array): self
+    public function handle(Request $request, Closure $next)
     {
-        $account = new Account;
+        if (session()->has(Constants::MAPPING_COMPLETE_INDICATOR) && true === session()->get(Constants::MAPPING_COMPLETE_INDICATOR)) {
+            return redirect()->route('import.run.index');
+        }
 
-        $account->id   = (int)$array['id'];
-        $account->name = $array['attributes']['name'];
-        $account->type = $array['attributes']['type'];
-        $account->iban = $array['attributes']['iban'];
-
-        return $account;
-
+        return $next($request);
     }
-
 }
