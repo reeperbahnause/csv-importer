@@ -1,6 +1,6 @@
 <?php
 /**
- * FileReader.php
+ * PostTransactionResponse.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,39 +20,33 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\File;
+namespace App\Services\FireflyIIIApi\Response;
 
-
-use App\Services\Session\Constants;
-use App\Services\Storage\StorageService;
-use League\Csv\Reader;
+use App\Services\FireflyIIIApi\Model\TransactionGroup;
 
 /**
- * Class FileReader
+ * Class PostTransactionResponse
  */
-class FileReader
+class PostTransactionResponse extends Response
 {
-    /**
-     * Get a CSV file reader and fill it with data from CSV file.
-     * @return Reader
-     */
-    public static function getReaderFromSession(): Reader
-    {
-        $content = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $reader  = Reader::createFromString($content);
-
-        // room for config
-        return $reader;
-    }
+    /** @var TransactionGroup */
+    private $transactionGroup;
 
     /**
-     * @param string $content
+     * Response constructor.
      *
-     * @return Reader
+     * @param array $data
      */
-    public static function getReaderFromContent(string $content): Reader
+    public function __construct(array $data)
     {
-        return Reader::createFromString($content);
+        $this->transactionGroup = new TransactionGroup($data);
     }
 
+    /**
+     * @return TransactionGroup
+     */
+    public function getTransactionGroup(): ?TransactionGroup
+    {
+        return $this->transactionGroup;
+    }
 }

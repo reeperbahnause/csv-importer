@@ -1,6 +1,6 @@
 <?php
 /**
- * FileReader.php
+ * Transaction.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,39 +20,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\File;
-
-
-use App\Services\Session\Constants;
-use App\Services\Storage\StorageService;
-use League\Csv\Reader;
+namespace App\Services\FireflyIIIApi\Model;
 
 /**
- * Class FileReader
+ * Class Transaction
  */
-class FileReader
+class Transaction
 {
+    public $amount;
+    public $date;
+    public $description;
+    public $id;
+    public $type;
+    public $currencyCode;
     /**
-     * Get a CSV file reader and fill it with data from CSV file.
-     * @return Reader
-     */
-    public static function getReaderFromSession(): Reader
-    {
-        $content = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $reader  = Reader::createFromString($content);
-
-        // room for config
-        return $reader;
-    }
-
-    /**
-     * @param string $content
+     * Transaction constructor.
      *
-     * @return Reader
+     * @param array $data
      */
-    public static function getReaderFromContent(string $content): Reader
+    public function __construct(array $data)
     {
-        return Reader::createFromString($content);
+        $this->id          = (int)$data['transaction_journal_id'];
+        $this->description = $data['description'];
+        $this->type        = $data['type'];
+        $this->date        = $data['date'];
+        $this->amount      = $data['amount'];
+        $this->currencyCode = $data['currency_code'];
     }
 
 }

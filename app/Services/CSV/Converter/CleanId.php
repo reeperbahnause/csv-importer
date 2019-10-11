@@ -1,6 +1,6 @@
 <?php
 /**
- * FileReader.php
+ * CleanId.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,39 +20,26 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\File;
-
-
-use App\Services\Session\Constants;
-use App\Services\Storage\StorageService;
-use League\Csv\Reader;
+namespace App\Services\CSV\Converter;
 
 /**
- * Class FileReader
+ * Class CleanId
  */
-class FileReader
+class CleanId implements ConverterInterface
 {
-    /**
-     * Get a CSV file reader and fill it with data from CSV file.
-     * @return Reader
-     */
-    public static function getReaderFromSession(): Reader
-    {
-        $content = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $reader  = Reader::createFromString($content);
-
-        // room for config
-        return $reader;
-    }
 
     /**
-     * @param string $content
+     * Convert a value.
      *
-     * @return Reader
+     * @param $value
+     *
+     * @return mixed
+     *
      */
-    public static function getReaderFromContent(string $content): Reader
+    public function convert($value)
     {
-        return Reader::createFromString($content);
-    }
+        $value = (int)$value;
 
+        return 0 === $value ? null : $value;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * FileReader.php
+ * TransactionGroup.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,39 +20,34 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\File;
+namespace App\Services\FireflyIIIApi\Model;
 
-
-use App\Services\Session\Constants;
-use App\Services\Storage\StorageService;
-use League\Csv\Reader;
 
 /**
- * Class FileReader
+ * Class TransactionGroup
  */
-class FileReader
+class TransactionGroup
 {
-    /**
-     * Get a CSV file reader and fill it with data from CSV file.
-     * @return Reader
-     */
-    public static function getReaderFromSession(): Reader
-    {
-        $content = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $reader  = Reader::createFromString($content);
-
-        // room for config
-        return $reader;
-    }
+    /** @var string */
+    public $groupTitle;
+    /** @var int */
+    public $id;
+    /** @var array */
+    public $transactions;
 
     /**
-     * @param string $content
+     * TransactionGroup constructor.
      *
-     * @return Reader
+     * @param array $data
      */
-    public static function getReaderFromContent(string $content): Reader
+    public function __construct(array $data)
     {
-        return Reader::createFromString($content);
+        $this->transactions = [];
+        $this->id           = (int)$data['id'];
+        $this->groupTitle   = $data['attributes']['group_title'];
+        foreach ($data['attributes']['transactions'] as $transaction) {
+            $this->transactions[] = new Transaction($transaction);
+        }
     }
 
 }

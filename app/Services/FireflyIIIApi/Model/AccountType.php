@@ -1,6 +1,6 @@
 <?php
 /**
- * FileReader.php
+ * AccountType.php
  * Copyright (c) 2019 thegrumpydictator@gmail.com
  *
  * This file is part of Firefly III CSV Importer.
@@ -20,39 +20,37 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\File;
-
-
-use App\Services\Session\Constants;
-use App\Services\Storage\StorageService;
-use League\Csv\Reader;
+namespace App\Services\FireflyIIIApi\Model;
 
 /**
- * Class FileReader
+ * Class AccountType
  */
-class FileReader
+class AccountType
 {
-    /**
-     * Get a CSV file reader and fill it with data from CSV file.
-     * @return Reader
-     */
-    public static function getReaderFromSession(): Reader
-    {
-        $content = StorageService::getContent(session()->get(Constants::UPLOAD_CSV_FILE));
-        $reader  = Reader::createFromString($content);
+    /** @var string */
+    public const ASSET = 'asset';
 
-        // room for config
-        return $reader;
-    }
+    /** @var string */
+    public const CASH = 'cash';
 
-    /**
-     * @param string $content
-     *
-     * @return Reader
-     */
-    public static function getReaderFromContent(string $content): Reader
-    {
-        return Reader::createFromString($content);
-    }
+    /** @var string */
+    public const DEBT = 'debt';
 
+    /** @var string */
+    public const LOAN = 'loan';
+
+    /** @var string */
+    public const EXPENSE = 'expense';
+
+    /** @var string */
+    public const INITIAL_BALANCE = 'initial balance';
+
+    /** @var string */
+    public const MORTGAGE = 'mortgage';
+
+    /** @var string */
+    public const RECONCILIATION = 'reconciliation';
+
+    /** @var string */
+    public const REVENUE = 'revenue';
 }
