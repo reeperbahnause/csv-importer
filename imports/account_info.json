@@ -7,12 +7,17 @@
     "column-count": 47,
     "column-roles": [
         "opposing-name",
+        "opposing-bic",
+        "opposing-iban",
+        "account-name",
         "description",
         "amount",
-        "date-transaction",
-        "rabo-debit-credit"
+        "date-transaction"
     ],
     "column-do-mapping": [
+        false,
+        false,
+        false,
         false,
         false,
         false,
