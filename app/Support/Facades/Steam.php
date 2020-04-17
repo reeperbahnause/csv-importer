@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 /**
- * CleanString.php
+ * Steam.php
  * Copyright (c) 2020 james@firefly-iii.org
  *
  * This file is part of the Firefly III CSV importer
@@ -21,36 +21,23 @@ declare(strict_types=1);
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\Converter;
+namespace App\Support\Facades;
+
+
+use Illuminate\Support\Facades\Facade;
 
 /**
- * Class CleanString
+ * Class Steam
  */
-class CleanString implements ConverterInterface
+class Steam extends Facade
 {
-
     /**
-     * Convert a value.
+     * Get the registered name of the component.
      *
-     * @param $value
-     *
-     * @return mixed
-     *
+     * @return string
      */
-    public function convert($value)
+    protected static function getFacadeAccessor(): string
     {
-        $value = app('steam')->cleanStringAndNewlines($value);
-
-        // also remove newlines:
-        return trim(str_replace("\n", '', $value));
-    }
-    /**
-     * Add extra configuration parameters.
-     *
-     * @param string $configuration
-     */
-    public function setConfiguration(string $configuration): void
-    {
-
+        return 'steam';
     }
 }
