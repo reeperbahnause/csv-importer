@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 /**
- * OpposingAccountIbans.php
+ * Steam.php
  * Copyright (c) 2020 james@firefly-iii.org
  *
  * This file is part of the Firefly III CSV importer
@@ -21,26 +21,23 @@ declare(strict_types=1);
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace App\Services\CSV\Mapper;
+namespace App\Support\Facades;
 
-use App\Exceptions\ImportException;
+
+use Illuminate\Support\Facades\Facade;
 
 /**
- * Class OpposingAccountIbans
+ * Class Steam
  */
-class OpposingAccountIbans implements MapperInterface
+class Steam extends Facade
 {
-    use GetAccounts;
-
     /**
-     * Get map of objects.
+     * Get the registered name of the component.
      *
-     * @throws ImportException
-     * @throws \GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException
-     * @return array
+     * @return string
      */
-    public function getMap(): array
+    protected static function getFacadeAccessor(): string
     {
-        return $this->mergeWithIBAN($this->getAllAccounts());
+        return 'steam';
     }
 }
