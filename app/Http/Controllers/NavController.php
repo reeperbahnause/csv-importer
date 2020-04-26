@@ -1,6 +1,6 @@
 <?php
 /**
- * IndexController.php
+ * NavController.php
  * Copyright (c) 2020 james@firefly-iii.org
  *
  * This file is part of the Firefly III CSV importer
@@ -20,53 +20,50 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare(strict_types=1);
-
 namespace App\Http\Controllers;
-use App\Mail\ImportFinished;
-use Artisan;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Redirector;
-use Illuminate\View\View;
-use Log;
-use Mail;
+
+use App\Services\Session\Constants;
 
 /**
- *
- * Class IndexController
+ * Class NavController
  */
-class IndexController extends Controller
+class NavController extends Controller
 {
     /**
-     * IndexController constructor.
+     * Return back to upload.
      */
-    public function __construct()
+    public function toConfig()
     {
-        parent::__construct();
-        app('view')->share('pageTitle', 'Index');
+        session()->forget(Constants::CONFIG_COMPLETE_INDICATOR);
+
+        return redirect(route('import.configure.index') . '?overruleskip=true');
     }
 
     /**
-     * @return Factory|View
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function index()
+    public function toRoles()
     {
-        Log::debug(sprintf('Now at %s', __METHOD__));
-
-        return view('index');
+        session()->forget(Constants::ROLES_COMPLETE_INDICATOR);
+        return redirect(route('import.roles.index'));
     }
 
     /**
-     * @return RedirectResponse|Redirector
+     * Return back to index. Needs no session updates.
      */
-    public function flush()
+    public function toStart()
     {
-        Log::debug(sprintf('Now at %s', __METHOD__));
-        session()->flush();
-        Artisan::call('cache:clear');
-
         return redirect(route('index'));
+    }
+
+    /**
+     * Return back to upload.
+     */
+    public function toUpload()
+    {
+        session()->forget(Constants::HAS_UPLOAD);
+
+        return redirect(route('import.start'));
     }
 
 }
