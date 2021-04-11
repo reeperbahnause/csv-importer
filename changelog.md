@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.1 - 2021-04-11
+
+### Added
+- Expand the readme with instructions and new logo. Thanks, @ColinMaudry!
+
+### Fixed
+- Several cases where URL's could be empty.
+- CSV importer will start counting from 1, not from 0 when showing messages. Thanks, @lastlink!
+
 ## 2.5.0 - 2021-02-06
 
 ### Added
