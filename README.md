@@ -6,8 +6,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://firefly-iii.org/">
-    <img src="https://www.firefly-iii.org/static/img/logo-small-new.png" alt="Logo" width="96" height="96">
+      <img src="https://fireflyiiiwebsite.z6.web.core.windows.net/assets/logo/small.png" alt="Firefly III" width="120" height="178">
   </a>
 </p>
   <h1 align="center">Firefly III CSV importer</h1>
@@ -84,6 +83,11 @@ The [full usage instructions](https://docs.firefly-iii.org/csv) can be found in 
 4. [Set each column's role and data type](https://docs.firefly-iii.org/csv/usage/roles/).
 5. [Map values in the CSV file to existing values in your database](https://docs.firefly-iii.org/csv/usage/map/).
 6. [Enjoy the result in Firefly III](https://github.com/firefly-iii/firefly-iii).
+
+### Using the command line
+
+1. [Set up and configure the CSV importer](https://docs.firefly-iii.org/csv/install/configure/).
+2. [Follow the command line instructions](https://docs.firefly-iii.org/csv/usage/command_line/)
 
 ### Using the auto-import
 
