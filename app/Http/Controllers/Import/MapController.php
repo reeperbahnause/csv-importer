@@ -31,11 +31,13 @@ use App\Services\CSV\Mapper\MapperInterface;
 use App\Services\CSV\Mapper\MapperService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use InvalidArgumentException;
+use League\Csv\Exception;
 use Log;
 
 /**
@@ -56,8 +58,8 @@ class MapController extends Controller
 
     /**
      * @return Factory|View
-     * @throws \League\Csv\Exception
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws Exception
+     * @throws FileNotFoundException
      */
     public function index()
     {

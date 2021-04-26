@@ -50,8 +50,8 @@ class StorageService
     /**
      * @param string $name
      *
-     * @throws FileNotFoundException
      * @return string
+     * @throws FileNotFoundException
      */
     public static function getContent(string $name): string
     {

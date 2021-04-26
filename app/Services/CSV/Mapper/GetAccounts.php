@@ -76,6 +76,21 @@ trait GetAccounts
     }
 
     /**
+     * @param GetAccountsResponse $list
+     *
+     * @return array
+     */
+    private function toArray(GetAccountsResponse $list): array
+    {
+        $return = [];
+        foreach ($list as $account) {
+            $return[] = $account;
+        }
+
+        return $return;
+    }
+
+    /**
      * Returns a combined list of asset accounts and all liability accounts.
      *
      * @return array
@@ -162,7 +177,6 @@ trait GetAccounts
         return $result;
     }
 
-
     /**
      * Merge all arrays into <select> ready list.
      *
@@ -186,20 +200,5 @@ trait GetAccounts
         }
 
         return $result;
-    }
-
-    /**
-     * @param GetAccountsResponse $list
-     *
-     * @return array
-     */
-    private function toArray(GetAccountsResponse $list): array
-    {
-        $return = [];
-        foreach ($list as $account) {
-            $return[] = $account;
-        }
-
-        return $return;
     }
 }

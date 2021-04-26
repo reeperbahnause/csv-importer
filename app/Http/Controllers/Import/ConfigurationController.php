@@ -127,7 +127,7 @@ class ConfigurationController extends Controller
             }
         }
         // created default configuration object for sensible defaults:
-        if(null === $configuration) {
+        if (null === $configuration) {
             $configuration = Configuration::make();
         }
 
@@ -165,14 +165,13 @@ class ConfigurationController extends Controller
         $fromRequest   = $request->getAll();
         $configuration = Configuration::fromRequest($fromRequest);
 
-        $json          = '[]';
+        $json = '[]';
         try {
             $json = json_encode($configuration, JSON_THROW_ON_ERROR, 512);
         } catch (JsonException $e) {
             Log::error($e->getMessage());
         }
         StorageService::storeContent($json);
-
 
 
         session()->put(Constants::CONFIGURATION, $configuration->toArray());

@@ -74,7 +74,7 @@ class Amount implements ConverterInterface
 
         Log::debug(sprintf('Start with amount "%s"', $value));
         $original = $value;
-        $value    = $this->stripAmount((string)$value);
+        $value    = $this->stripAmount((string) $value);
         $decimal  = null;
 
         if ($this->decimalIsDot($value)) {
@@ -128,19 +128,46 @@ class Amount implements ConverterInterface
     }
 
     /**
-     * Check if the value has a dot or comma on an alternative place,
-     * catching strings like ",1" or ".5".
+     * Strip amount from weird characters.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    private function stripAmount(string $value): string
+    {
+        if (0 === strpos($value, '--')) {
+            $value = substr($value, 2);
+        }
+        // have to strip the € because apparantly the Postbank (DE) thinks "1.000,00 €" is a normal way to format a number.
+        // 2020-12-01 added "EUR" because another German bank doesn't know what a data format is.
+        // This way of stripping exceptions is unsustainable.
+        $value = trim((string) str_replace(['€', 'EUR'], '', $value));
+        $str   = preg_replace('/[^\-().,0-9 ]/', '', $value);
+        $len   = strlen($str);
+        if (0 === strpos($str, '(') && ')' === $str[$len - 1]) {
+            $str = '-' . substr($str, 1, $len - 2);
+        }
+        $str = trim($str);
+
+        Log::debug(sprintf('Stripped "%s" away to "%s"', $value, $str));
+
+        return $str;
+    }
+
+    /**
+     * Helper function to see if the decimal separator is a dot.
      *
      * @param string $value
      *
      * @return bool
      */
-    private function alternativeDecimalSign(string $value): bool
+    private function decimalIsDot(string $value): bool
     {
-        $length      = strlen($value);
-        $altPosition = $length - 2;
+        $length          = strlen($value);
+        $decimalPosition = $length - 3;
 
-        return $length > 1 && ('.' === $value[$altPosition] || ',' === $value[$altPosition]);
+        return ($length > 2 && '.' === $value[$decimalPosition]) || ($length > 2 && strpos($value, '.') > $decimalPosition);
     }
 
     /**
@@ -159,18 +186,36 @@ class Amount implements ConverterInterface
     }
 
     /**
-     * Helper function to see if the decimal separator is a dot.
+     * Check if the value has a dot or comma on an alternative place,
+     * catching strings like ",1" or ".5".
      *
      * @param string $value
      *
      * @return bool
      */
-    private function decimalIsDot(string $value): bool
+    private function alternativeDecimalSign(string $value): bool
     {
-        $length          = strlen($value);
-        $decimalPosition = $length - 3;
+        $length      = strlen($value);
+        $altPosition = $length - 2;
 
-        return ($length > 2 && '.' === $value[$decimalPosition]) || ($length > 2 && strpos($value, '.') > $decimalPosition);
+        return $length > 1 && ('.' === $value[$altPosition] || ',' === $value[$altPosition]);
+    }
+
+    /**
+     * Returns the alternative decimal point used, such as a dot or a comma,
+     * from strings like ",1" or "0.5".
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    private function getAlternativeDecimalSign(string $value): string
+    {
+        $length      = strlen($value);
+        $altPosition = $length - 2;
+
+        return $value[$altPosition];
+
     }
 
     /**
@@ -195,23 +240,6 @@ class Amount implements ConverterInterface
     }
 
     /**
-     * Returns the alternative decimal point used, such as a dot or a comma,
-     * from strings like ",1" or "0.5".
-     *
-     * @param string $value
-     *
-     * @return string
-     */
-    private function getAlternativeDecimalSign(string $value): string
-    {
-        $length      = strlen($value);
-        $altPosition = $length - 2;
-
-        return $value[$altPosition];
-
-    }
-
-    /**
      * Replaces other characters like thousand separators with nothing to make the decimal separator the only special
      * character in the string.
      *
@@ -230,34 +258,6 @@ class Amount implements ConverterInterface
 
         /** @noinspection CascadeStringReplacementInspection */
         return str_replace(',', '.', $value);
-    }
-
-    /**
-     * Strip amount from weird characters.
-     *
-     * @param string $value
-     *
-     * @return string
-     */
-    private function stripAmount(string $value): string
-    {
-        if (0 === strpos($value, '--')) {
-            $value = substr($value, 2);
-        }
-        // have to strip the € because apparantly the Postbank (DE) thinks "1.000,00 €" is a normal way to format a number.
-        // 2020-12-01 added "EUR" because another German bank doesn't know what a data format is.
-        // This way of stripping exceptions is unsustainable.
-        $value = trim((string)str_replace(['€', 'EUR'], '', $value));
-        $str   = preg_replace('/[^\-().,0-9 ]/', '', $value);
-        $len   = strlen($str);
-        if (0 === strpos($str, '(') && ')' === $str[$len - 1]) {
-            $str = '-' . substr($str, 1, $len - 2);
-        }
-        $str = trim($str);
-
-        Log::debug(sprintf('Stripped "%s" away to "%s"', $value, $str));
-
-        return $str;
     }
 
     /**

@@ -23,6 +23,7 @@
 declare(strict_types=1);
 
 namespace App\Services\Import;
+
 use App\Services\CSV\Converter\ConverterService;
 use Log;
 
@@ -53,19 +54,19 @@ class ColumnValue
     }
 
     /**
-     * @param bool $appendValue
-     */
-    public function setAppendValue(bool $appendValue): void
-    {
-        $this->appendValue = $appendValue;
-    }
-
-    /**
      * @return bool
      */
     public function isAppendValue(): bool
     {
         return $this->appendValue;
+    }
+
+    /**
+     * @param bool $appendValue
+     */
+    public function setAppendValue(bool $appendValue): void
+    {
+        $this->appendValue = $appendValue;
     }
 
     /**
@@ -77,19 +78,19 @@ class ColumnValue
     }
 
     /**
-     * @param string $configuration
-     */
-    public function setConfiguration(string $configuration): void
-    {
-        $this->configuration = $configuration;
-    }
-
-    /**
      * @param int $mappedValue
      */
     public function setMappedValue(int $mappedValue): void
     {
         $this->mappedValue = $mappedValue;
+    }
+
+    /**
+     * @param string $configuration
+     */
+    public function setConfiguration(string $configuration): void
+    {
+        $this->configuration = $configuration;
     }
 
     /**
@@ -115,11 +116,11 @@ class ColumnValue
     {
         if (0 !== $this->mappedValue) {
             /** @noinspection UnnecessaryCastingInspection */
-            return (int)$this->mappedValue;
+            return (int) $this->mappedValue;
         }
 
         // run converter on data:
-        $converterClass = (string)config(sprintf('csv_importer.import_roles.%s.converter', $this->role));
+        $converterClass = (string) config(sprintf('csv_importer.import_roles.%s.converter', $this->role));
         Log::debug(sprintf('getParsedValue will run %s', $converterClass));
         return ConverterService::convert($converterClass, $this->value, $this->configuration);
     }

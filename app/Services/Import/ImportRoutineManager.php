@@ -90,6 +90,23 @@ class ImportRoutineManager
     }
 
     /**
+     *
+     */
+    private function generateIdentifier(): void
+    {
+        Log::debug('Going to generate identifier.');
+        $disk  = Storage::disk('jobs');
+        $count = 0;
+        do {
+            $generatedId = Str::random(16);
+            $count++;
+            Log::debug(sprintf('Attempt #%d results in "%s"', $count, $generatedId));
+        } while ($count < 30 && $disk->exists($generatedId));
+        $this->identifier = $generatedId;
+        Log::info(sprintf('Job identifier is "%s"', $generatedId));
+    }
+
+    /**
      * @param Configuration $configuration
      *
      * @throws ImportException
@@ -179,31 +196,6 @@ class ImportRoutineManager
     }
 
     /**
-     *
-     */
-    private function generateIdentifier(): void
-    {
-        Log::debug('Going to generate identifier.');
-        $disk  = Storage::disk('jobs');
-        $count = 0;
-        do {
-            $generatedId = Str::random(16);
-            $count++;
-            Log::debug(sprintf('Attempt #%d results in "%s"', $count, $generatedId));
-        } while ($count < 30 && $disk->exists($generatedId));
-        $this->identifier = $generatedId;
-        Log::info(sprintf('Job identifier is "%s"', $generatedId));
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentifier(): string
-    {
-        return $this->identifier;
-    }
-
-    /**
      * @param int $count
      */
     private function mergeMessages(int $count): void
@@ -251,7 +243,6 @@ class ImportRoutineManager
         $this->allWarnings = $total;
     }
 
-
     /**
      * @param int $count
      */
@@ -274,6 +265,14 @@ class ImportRoutineManager
         }
 
         $this->allErrors = $total;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
     }
 
 }

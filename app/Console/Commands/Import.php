@@ -38,6 +38,7 @@ use Log;
 class Import extends Command
 {
     use HaveAccess, VerifyJSON, StartImport;
+
     /**
      * The console command description.
      *
@@ -131,7 +132,6 @@ class Import extends Command
             Log::debug('SEND MAIL');
             Mail::to(config('mail.destination'))->send(new ImportFinished($log));
         }
-
 
 
         return $result;

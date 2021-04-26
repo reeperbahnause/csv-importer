@@ -80,51 +80,10 @@ class AbnAmroDescription implements SpecificInterface
         // If the description could not be parsed, specify an unknown opposing
         // account, as an opposing account is required
         if (!$parsed) {
-            $this->row[8] = (string)trans('firefly.unknown'); // opposing-account-name
+            $this->row[8] = (string) trans('firefly.unknown'); // opposing-account-name
         }
 
         return $this->row;
-    }
-
-    /**
-     * Parses the current description with costs from ABN AMRO itself.
-     *
-     * @return bool true if the description is GEA/BEA-format, false otherwise
-     */
-    protected function parseABNAMRODescription(): bool
-    {
-        // See if the current description is formatted in ABN AMRO format
-        if (preg_match('/ABN AMRO.{24} (.*)/', $this->row[7], $matches)) {
-            $this->row[8] = 'ABN AMRO'; // this one is new (opposing account name)
-            $this->row[7] = $matches[1]; // this is the description
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Parses the current description in GEA/BEA format.
-     *
-     * @return bool true if the description is GEA/BEAformat, false otherwise
-     */
-    protected function parseGEABEADescription(): bool
-    {
-        // See if the current description is formatted in GEA/BEA format
-        if (preg_match('/([BG]EA) +(NR:[a-zA-Z:0-9]+) +([0-9.\/]+) +([^,]*)/', $this->row[7], $matches)) {
-            // description and opposing account will be the same.
-            $this->row[8] = $matches[4]; // 'opposing-account-name'
-            $this->row[7] = $matches[4]; // 'description'
-
-            if ('GEA' === $matches[1]) {
-                $this->row[7] = 'GEA ' . $matches[4]; // 'description'
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -232,6 +191,47 @@ class AbnAmroDescription implements SpecificInterface
                     $this->row[7] = sprintf('%s - %s (%s)', $type, $name, $reference);
                 }
             }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Parses the current description in GEA/BEA format.
+     *
+     * @return bool true if the description is GEA/BEAformat, false otherwise
+     */
+    protected function parseGEABEADescription(): bool
+    {
+        // See if the current description is formatted in GEA/BEA format
+        if (preg_match('/([BG]EA) +(NR:[a-zA-Z:0-9]+) +([0-9.\/]+) +([^,]*)/', $this->row[7], $matches)) {
+            // description and opposing account will be the same.
+            $this->row[8] = $matches[4]; // 'opposing-account-name'
+            $this->row[7] = $matches[4]; // 'description'
+
+            if ('GEA' === $matches[1]) {
+                $this->row[7] = 'GEA ' . $matches[4]; // 'description'
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Parses the current description with costs from ABN AMRO itself.
+     *
+     * @return bool true if the description is GEA/BEA-format, false otherwise
+     */
+    protected function parseABNAMRODescription(): bool
+    {
+        // See if the current description is formatted in ABN AMRO format
+        if (preg_match('/ABN AMRO.{24} (.*)/', $this->row[7], $matches)) {
+            $this->row[8] = 'ABN AMRO';  // this one is new (opposing account name)
+            $this->row[7] = $matches[1]; // this is the description
 
             return true;
         }

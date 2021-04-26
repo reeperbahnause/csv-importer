@@ -37,8 +37,8 @@ class FileReader
     /**
      * Get a CSV file reader and fill it with data from CSV file.
      *
-     * @throws FileNotFoundException
      * @return Reader
+     * @throws FileNotFoundException
      */
     public static function getReaderFromSession(): Reader
     {

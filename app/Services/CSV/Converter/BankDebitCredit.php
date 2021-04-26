@@ -37,9 +37,9 @@ class BankDebitCredit implements ConverterInterface
     /**
      * Convert a value.
      *
+     * @param $value
      * @return mixed
      *
-     * @param $value
      */
     public function convert($value): int
     {
@@ -59,6 +59,7 @@ class BankDebitCredit implements ConverterInterface
 
         return 1;
     }
+
     /**
      * Add extra configuration parameters.
      *

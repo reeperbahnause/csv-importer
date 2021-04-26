@@ -43,9 +43,9 @@ class Date implements ConverterInterface
      */
     public function __construct()
     {
-        $this->dateFormat = 'Y-m-d';
-        $this->dateLocale = 'en';
-        $this->dateFormatPattern = '/(?:('. join("|", array_keys(Language::all())).')\:)?(.+)/';
+        $this->dateFormat        = 'Y-m-d';
+        $this->dateLocale        = 'en';
+        $this->dateFormatPattern = '/(?:(' . join("|", array_keys(Language::all())) . ')\:)?(.+)/';
     }
 
     /**
@@ -74,7 +74,7 @@ class Date implements ConverterInterface
             Log::debug(sprintf('Date converter is going to work on "%s" using format "%s"', $string, $this->dateFormat));
             try {
                 $carbon = Carbon::createFromLocaleFormat($this->dateFormat, $this->dateLocale, $string);
-            } catch (InvalidArgumentException|Exception $e) {
+            } catch (InvalidArgumentException | Exception $e) {
                 Log::error(sprintf('%s converting the date: %s', get_class($e), $e->getMessage()));
 
                 return Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
@@ -91,7 +91,7 @@ class Date implements ConverterInterface
      */
     public function setConfiguration(string $configuration): void
     {
-        list($this->dateLocale, $this->dateFormat) = $this->splitLocaleFormat($configuration);
+        [$this->dateLocale, $this->dateFormat] = $this->splitLocaleFormat($configuration);
     }
 
     /**
@@ -100,8 +100,8 @@ class Date implements ConverterInterface
      */
     public function splitLocaleFormat(string $format): array
     {
-        $currentDateLocale = 'en';
-        $currentDateFormat = 'Y-m-d';
+        $currentDateLocale       = 'en';
+        $currentDateFormat       = 'Y-m-d';
         $dateFormatConfiguration = [];
         preg_match($this->dateFormatPattern, $format, $dateFormatConfiguration);
         if (3 === count($dateFormatConfiguration)) {

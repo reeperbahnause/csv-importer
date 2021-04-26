@@ -31,7 +31,7 @@ class AutoImportController extends Controller
             throw new ImportException('Could not connect to your local Firefly III instance.');
         }
 
-        $argument = (string) ($request->get('directory') ?? './');
+        $argument        = (string) ($request->get('directory') ?? './');
         $this->directory = realpath($argument);
         $this->line(sprintf('Going to automatically import everything found in %s (%s)', $this->directory, $argument));
 
@@ -52,6 +52,14 @@ class AutoImportController extends Controller
         }
 
         return ' ';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function line(string $string)
+    {
+        echo sprintf("%s: %s\n", date('Y-m-d H:i:s'), $string);
     }
 
     /**
@@ -78,13 +86,5 @@ class AutoImportController extends Controller
     public function info($string, $verbosity = null)
     {
         $this->line($string);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function line(string $string)
-    {
-        echo sprintf("%s: %s\n", date('Y-m-d H:i:s'), $string);
     }
 }

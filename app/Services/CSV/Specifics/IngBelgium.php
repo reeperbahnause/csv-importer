@@ -106,6 +106,24 @@ class IngBelgium implements SpecificInterface
     }
 
     /**
+     * @param string $transactionDetails
+     * @param string $regex
+     *
+     * @return string
+     */
+    private static function parseInformationFromTransactionDetails(string $transactionDetails, string $regex): string
+    {
+        if (isset($transactionDetails)) {
+            preg_match($regex, $transactionDetails, $matches);
+            if (isset($matches['value'])) {
+                return trim($matches['value']);
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * Gets the opposing account's IBAN from the transaction details.
      *
      * @param string $transactionDetails
@@ -141,24 +159,6 @@ class IngBelgium implements SpecificInterface
             return '+++' . $matches[1] . '+++';
         }
         return $description;
-    }
-
-    /**
-     * @param string $transactionDetails
-     * @param string $regex
-     *
-     * @return string
-     */
-    private static function parseInformationFromTransactionDetails(string $transactionDetails, string $regex): string
-    {
-        if (isset($transactionDetails)) {
-            preg_match($regex, $transactionDetails, $matches);
-            if (isset($matches['value'])) {
-                return trim($matches['value']);
-            }
-        }
-
-        return '';
     }
 
     /**

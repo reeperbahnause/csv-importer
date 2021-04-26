@@ -68,7 +68,7 @@ class Request extends FormRequest
             return null;
         }
 
-        return (float)$res;
+        return (float) $res;
     }
 
     /**
@@ -80,7 +80,7 @@ class Request extends FormRequest
      */
     public function integer(string $field): int
     {
-        return (int)$this->get($field);
+        return (int) $this->get($field);
     }
 
     /**
@@ -99,7 +99,7 @@ class Request extends FormRequest
             return null;
         }
 
-        return (int)$string;
+        return (int) $string;
     }
 
     /**
@@ -115,12 +115,12 @@ class Request extends FormRequest
             return null;
         }
 
-        $value = (string)$this->get($field);
+        $value = (string) $this->get($field);
         if ('' === $value) {
             return null;
         }
 
-        return (int)$value;
+        return (int) $value;
     }
 
     /**
@@ -136,7 +136,7 @@ class Request extends FormRequest
             return null;
         }
 
-        return app('steam')->cleanStringAndNewlines((string)($this->get($field) ?? ''));
+        return app('steam')->cleanStringAndNewlines((string) ($this->get($field) ?? ''));
     }
 
     /**
@@ -148,7 +148,7 @@ class Request extends FormRequest
      */
     public function string(string $field): string
     {
-        return app('steam')->cleanStringAndNewlines((string)($this->get($field) ?? ''));
+        return app('steam')->cleanStringAndNewlines((string) ($this->get($field) ?? ''));
     }
 
     /**

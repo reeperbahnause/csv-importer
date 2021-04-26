@@ -24,6 +24,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Services\Session\Constants;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 
 /**
  * Class NavController
@@ -41,7 +44,7 @@ class NavController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return Application|RedirectResponse|Redirector
      */
     public function toRoles()
     {

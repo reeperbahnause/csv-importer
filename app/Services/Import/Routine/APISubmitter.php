@@ -85,101 +85,6 @@ class APISubmitter
     }
 
     /**
-     * @param bool $addTag
-     */
-    public function setAddTag(bool $addTag): void
-    {
-        $this->addTag = $addTag;
-    }
-
-    /**
-     * @param array $groupInfo
-     */
-    private function addTagToGroups(array $groupInfo): void
-    {
-        if ([] === $groupInfo) {
-            Log::info('No info on group.');
-
-            return;
-        }
-        if (false === $this->addTag) {
-            Log::debug('Will not add import tag.');
-
-            return;
-        }
-
-        $groupId = (int) $groupInfo['group_id'];
-        Log::debug(sprintf('Going to add import tag to transaction group #%d', $groupId));
-        $body = [
-            'transactions' => [],
-        ];
-        /**
-         * @var int   $journalId
-         * @var array $currentTags
-         */
-        foreach ($groupInfo['journals'] as $journalId => $currentTags) {
-            $currentTags[]          = $this->tag;
-            $body['transactions'][] =
-                [
-                    'transaction_journal_id' => $journalId,
-                    'tags'                   => $currentTags,
-                ];
-        }
-        $url     = Token::getURL();
-        $token   = Token::getAccessToken();
-        $request = new PutTransactionRequest($url, $token, $groupId);
-        $request->setVerify(config('csv_importer.connection.verify'));
-        $request->setTimeOut(config('csv_importer.connection.timeout'));
-        $request->setBody($body);
-        try {
-            $request->put();
-        } catch (ApiHttpException $e) {
-            Log::error($e->getMessage());
-            Log::error($e->getTraceAsString());
-            $this->addError(0, 'Could not store transaction: see the log files.');
-        }
-    }
-
-
-    /**
-     * @param int              $lineIndex
-     * @param array            $line
-     * @param TransactionGroup $group
-     */
-    private function compareArrays(int $lineIndex, array $line, TransactionGroup $group): void
-    {
-        // some fields may not have survived. Be sure to warn the user about this.
-        /** @var Transaction $transaction */
-        foreach ($group->transactions as $index => $transaction) {
-            // compare currency ID
-            if (null !== $line['transactions'][$index]['currency_id']
-                && (int) $line['transactions'][$index]['currency_id'] !== (int) $transaction->currencyId
-            ) {
-                $this->addWarning(
-                    $lineIndex,
-                    sprintf(
-                        'Line #%d may have had its currency changed (from ID #%d to ID #%d). This happens because the associated asset account overrules the currency of the transaction.',
-                        $lineIndex, $line['transactions'][$index]['currency_id'], (int) $transaction->currencyId
-                    )
-                );
-            }
-            // compare currency code:
-            if (null !== $line['transactions'][$index]['currency_code']
-                && $line['transactions'][$index]['currency_code'] !== $transaction->currencyCode
-            ) {
-                $this->addWarning(
-                    $lineIndex,
-                    sprintf(
-                        'Line #%d may have had its currency changed (from "%s" to "%s"). This happens because the associated asset account overrules the currency of the transaction.',
-                        $lineIndex, $line['transactions'][$index]['currency_code'], $transaction->currencyCode
-                    )
-                );
-            }
-
-        }
-    }
-
-    /**
      *
      */
     private function createTag(): void
@@ -403,12 +308,106 @@ class APISubmitter
     }
 
     /**
+     * @param int              $lineIndex
+     * @param array            $line
+     * @param TransactionGroup $group
+     */
+    private function compareArrays(int $lineIndex, array $line, TransactionGroup $group): void
+    {
+        // some fields may not have survived. Be sure to warn the user about this.
+        /** @var Transaction $transaction */
+        foreach ($group->transactions as $index => $transaction) {
+            // compare currency ID
+            if (null !== $line['transactions'][$index]['currency_id']
+                && (int) $line['transactions'][$index]['currency_id'] !== (int) $transaction->currencyId
+            ) {
+                $this->addWarning(
+                    $lineIndex,
+                    sprintf(
+                        'Line #%d may have had its currency changed (from ID #%d to ID #%d). This happens because the associated asset account overrules the currency of the transaction.',
+                        $lineIndex, $line['transactions'][$index]['currency_id'], (int) $transaction->currencyId
+                    )
+                );
+            }
+            // compare currency code:
+            if (null !== $line['transactions'][$index]['currency_code']
+                && $line['transactions'][$index]['currency_code'] !== $transaction->currencyCode
+            ) {
+                $this->addWarning(
+                    $lineIndex,
+                    sprintf(
+                        'Line #%d may have had its currency changed (from "%s" to "%s"). This happens because the associated asset account overrules the currency of the transaction.',
+                        $lineIndex, $line['transactions'][$index]['currency_code'], $transaction->currencyCode
+                    )
+                );
+            }
+
+        }
+    }
+
+    /**
+     * @param array $groupInfo
+     */
+    private function addTagToGroups(array $groupInfo): void
+    {
+        if ([] === $groupInfo) {
+            Log::info('No info on group.');
+
+            return;
+        }
+        if (false === $this->addTag) {
+            Log::debug('Will not add import tag.');
+
+            return;
+        }
+
+        $groupId = (int) $groupInfo['group_id'];
+        Log::debug(sprintf('Going to add import tag to transaction group #%d', $groupId));
+        $body = [
+            'transactions' => [],
+        ];
+        /**
+         * @var int   $journalId
+         * @var array $currentTags
+         */
+        foreach ($groupInfo['journals'] as $journalId => $currentTags) {
+            $currentTags[]          = $this->tag;
+            $body['transactions'][] =
+                [
+                    'transaction_journal_id' => $journalId,
+                    'tags'                   => $currentTags,
+                ];
+        }
+        $url     = Token::getURL();
+        $token   = Token::getAccessToken();
+        $request = new PutTransactionRequest($url, $token, $groupId);
+        $request->setVerify(config('csv_importer.connection.verify'));
+        $request->setTimeOut(config('csv_importer.connection.timeout'));
+        $request->setBody($body);
+        try {
+            $request->put();
+        } catch (ApiHttpException $e) {
+            Log::error($e->getMessage());
+            Log::error($e->getTraceAsString());
+            $this->addError(0, 'Could not store transaction: see the log files.');
+        }
+    }
+
+    /**
      * @param Configuration $configuration
      */
     public function setConfiguration(Configuration $configuration): void
     {
         $this->configuration = $configuration;
         $this->setAddTag($configuration->isAddImportTag());
+    }
+
+    /**
+     * @param bool $addTag
+     */
+    public function setAddTag(bool $addTag): void
+    {
+        $this->addTag = $addTag;
     }
 
 

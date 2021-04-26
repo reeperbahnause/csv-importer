@@ -29,6 +29,18 @@ namespace App\Support;
 class Steam
 {
     /**
+     * @param $value
+     *
+     * @return string
+     */
+    public function cleanStringAndNewlines($value): string
+    {
+        $string = $this->cleanString($value);
+
+        return trim(str_replace("\n", '', $string));
+    }
+
+    /**
      * Convert a value.
      *
      * @param $value
@@ -90,18 +102,6 @@ class Steam
         ];
 
         return trim(str_replace($search, "\x20", $value));
-    }
-
-    /**
-     * @param $value
-     *
-     * @return string
-     */
-    public function cleanStringAndNewlines($value): string
-    {
-        $string = $this->cleanString($value);
-
-        return trim(str_replace("\n", '', $string));
     }
 
 }

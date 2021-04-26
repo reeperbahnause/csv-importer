@@ -29,22 +29,17 @@ namespace App\Services\Import\ImportJobStatus;
 class ImportJobStatus
 {
     /** @var string */
-    public const JOB_WAITING = 'waiting_to_start';
-    /** @var string */
-    public const JOB_RUNNING = 'job_running';
+    public const JOB_DONE = 'job_done';
     /** @var string */
     public const JOB_ERRORED = 'job_errored';
     /** @var string */
-    public const JOB_DONE = 'job_done';
-
+    public const JOB_RUNNING = 'job_running';
     /** @var string */
-    public $status;
-    /** @var array */
-    public $errors;
-    /** @var array */
-    public $warnings;
-    /** @var array */
-    public $messages;
+    public const JOB_WAITING = 'waiting_to_start';
+    public string $status;
+    public array  $errors;
+    public array  $warnings;
+    public array  $messages;
 
     /**
      * ImportJobStatus constructor.

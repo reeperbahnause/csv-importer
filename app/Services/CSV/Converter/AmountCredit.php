@@ -46,6 +46,7 @@ class AmountCredit implements ConverterInterface
 
         return Amount::positive($result);
     }
+
     /**
      * Add extra configuration parameters.
      *

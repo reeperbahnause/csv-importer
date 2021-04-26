@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace App\Services\CSV\Specifics;
 
 use Log;
+
 /**
  * Class IngDescription.
  *
@@ -101,24 +102,6 @@ class IngDescription implements SpecificInterface
     }
 
     /**
-     * Add the Opposing name from cell 1 in the description for Betaalautomaten
-     * Otherwise the description is only: 'Pasvolgnr:<nr> <date> Transactie:<NR> Term:<nr>'.
-     */
-    protected function addNameIngDescription(): void
-    {
-        $this->row[8] = sprintf('%s %s', $this->row[1] ?? '', $this->row[8] ?? '');
-    }
-
-    /**
-     * Remove "Omschrijving" (and NOT its value) from the description.
-     */
-    protected function removeIngDescription(): void
-    {
-        Log::debug('Remove "Omschrijving:"');
-        $this->row[8] = preg_replace('/Omschrijving: /', '', $this->row[8] ?? '');
-    }
-
-    /**
      * Remove IBAN number out of the  description
      * Default description of Description is: Naam: <OPPOS NAME> Omschrijving: <DESCRIPTION> IBAN: <OPPOS IBAN NR>.
      */
@@ -139,6 +122,15 @@ class IngDescription implements SpecificInterface
     }
 
     /**
+     * Remove "Omschrijving" (and NOT its value) from the description.
+     */
+    protected function removeIngDescription(): void
+    {
+        Log::debug('Remove "Omschrijving:"');
+        $this->row[8] = preg_replace('/Omschrijving: /', '', $this->row[8] ?? '');
+    }
+
+    /**
      * Move "Valutadatum" from the description to new column.
      */
     protected function moveValutadatumDescription(): void
@@ -151,18 +143,6 @@ class IngDescription implements SpecificInterface
     }
 
     /**
-     * Move "Datum/Tijd" from the description to new column.
-     */
-    protected function moveDatumTijdValue(): void
-    {
-        $matches = [];
-        if (preg_match('/Datum\/Tijd: ([0-9- :]+)/', $this->row[8], $matches)) {
-            $this->row[10] = date('Ymd H:i:s', strtotime($matches[1]));
-            $this->row[8] = preg_replace('/Datum\/Tijd: ([0-9- :]+)/', '', $this->row[8]);
-        }
-    }
-
-    /**
      * Move savings account number to column 1 and name to column 3.
      */
     private function MoveSavingsAccount(): void
@@ -170,22 +150,43 @@ class IngDescription implements SpecificInterface
         $matches = [];
 
         if (preg_match('/(Naar|Van) (.*rekening) ([A-Za-z0-9]+)/', $this->row[8], $matches)) { // Search for saving acount at 'Mededelingen' column
-            $this->row[1] .= ' ' . $matches[2] . ' ' . $matches[3]; // Current name + Saving acount name + Acount number
+            $this->row[1] .= ' ' . $matches[2] . ' ' . $matches[3];                            // Current name + Saving acount name + Acount number
             if ('' === (string) $this->row[3]) { // if Saving account number does not yet exists
-                $this->row[3] = $matches[3]; // Copy savings account number
+                $this->row[3] = $matches[3];     // Copy savings account number
             }
             $this->row[8] = preg_replace('/(Naar|Van) (.*rekening) ([A-Za-z0-9]+)/', '', $this->row[8]); // Remove the savings account content from description
         } elseif (preg_match('/(Naar|Van) (.*rekening) ([A-Za-z0-9]+)/', $this->row[1], $matches)) { // Search for saving acount at 'Naam / Omschrijving' column
-            $this->row[1] = $matches[2] . ' ' . $matches[3];  // Saving acount name + Acount number
+            $this->row[1] = $matches[2] . ' ' . $matches[3];                                         // Saving acount name + Acount number
             if ('' === (string) $this->row[3]) { // if Saving account number does not yet exists
-                $this->row[3] = $matches[3]; // Copy savings account number
+                $this->row[3] = $matches[3];     // Copy savings account number
             }
         }
 
         // if Saving account number exists
         if (('' !== (string) $this->row[3]) && !preg_match('/[A-Za-z]/', $this->row[3])) { // if Saving account number has no characters
-            $this->row[3] = sprintf('%010d', $this->row[3]); // Make the number 10 digits
+            $this->row[3] = sprintf('%010d', $this->row[3]);                               // Make the number 10 digits
         }
+    }
+
+    /**
+     * Move "Datum/Tijd" from the description to new column.
+     */
+    protected function moveDatumTijdValue(): void
+    {
+        $matches = [];
+        if (preg_match('/Datum\/Tijd: ([0-9- :]+)/', $this->row[8], $matches)) {
+            $this->row[10] = date('Ymd H:i:s', strtotime($matches[1]));
+            $this->row[8]  = preg_replace('/Datum\/Tijd: ([0-9- :]+)/', '', $this->row[8]);
+        }
+    }
+
+    /**
+     * Add the Opposing name from cell 1 in the description for Betaalautomaten
+     * Otherwise the description is only: 'Pasvolgnr:<nr> <date> Transactie:<NR> Term:<nr>'.
+     */
+    protected function addNameIngDescription(): void
+    {
+        $this->row[8] = sprintf('%s %s', $this->row[1] ?? '', $this->row[8] ?? '');
     }
 
     /**
@@ -193,7 +194,7 @@ class IngDescription implements SpecificInterface
      */
     public function runOnHeaders(array $headers): array
     {
-        $headers[9] = 'Valutadatum';
+        $headers[9]  = 'Valutadatum';
         $headers[10] = 'Datum + tijd';
         return $headers;
     }

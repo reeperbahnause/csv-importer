@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace App\Services\Import\Support;
 
 use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
-use JsonException;
 
 /**
  * Trait ProgressInformation
@@ -46,6 +45,30 @@ trait ProgressInformation
     public function setIdentifier(string $identifier): void
     {
         $this->identifier = $identifier;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return $this->errors ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages(): array
+    {
+        return $this->messages ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getWarnings(): array
+    {
+        return $this->warnings ?? [];
     }
 
     /**
@@ -88,30 +111,6 @@ trait ProgressInformation
 
         // write warning
         ImportJobStatusManager::addWarning($this->identifier, $index, $warning);
-    }
-
-    /**
-     * @return array
-     */
-    public function getErrors(): array
-    {
-        return $this->errors ?? [];
-    }
-
-    /**
-     * @return array
-     */
-    public function getMessages(): array
-    {
-        return $this->messages ?? [];
-    }
-
-    /**
-     * @return array
-     */
-    public function getWarnings(): array
-    {
-        return $this->warnings ?? [];
     }
 
 

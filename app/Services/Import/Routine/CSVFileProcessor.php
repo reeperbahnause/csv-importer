@@ -27,7 +27,6 @@ use App\Exceptions\ImportException;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Specifics\SpecificService;
 use App\Services\Import\Support\ProgressInformation;
-use InvalidArgumentException;
 use JsonException;
 use League\Csv\Exception;
 use League\Csv\Reader;
@@ -116,30 +115,6 @@ class CSVFileProcessor
     }
 
     /**
-     * @param bool $hasHeaders
-     */
-    public function setHasHeaders(bool $hasHeaders): void
-    {
-        $this->hasHeaders = $hasHeaders;
-    }
-
-    /**
-     * @param Reader $reader
-     */
-    public function setReader(Reader $reader): void
-    {
-        $this->reader = $reader;
-    }
-
-    /**
-     * @param array $specifics
-     */
-    public function setSpecifics(array $specifics): void
-    {
-        $this->specifics = $specifics;
-    }
-
-    /**
      * Loop all records from CSV file.
      *
      * @param ResultSet $records
@@ -170,6 +145,25 @@ class CSVFileProcessor
         }
 
         return $updatedRecords;
+    }
+
+    /**
+     * Do a first sanity check on whatever comes out of the CSV file.
+     *
+     * @param array $line
+     *
+     * @return array
+     */
+    private function sanitize(array $line): array
+    {
+        $lineValues = array_values($line);
+        array_walk(
+            $lineValues, static function ($element) {
+            return trim(str_replace('&nbsp;', ' ', (string) $element));
+        }
+        );
+
+        return $lineValues;
     }
 
     /**
@@ -205,24 +199,28 @@ class CSVFileProcessor
         return $return;
     }
 
+    /**
+     * @param bool $hasHeaders
+     */
+    public function setHasHeaders(bool $hasHeaders): void
+    {
+        $this->hasHeaders = $hasHeaders;
+    }
 
     /**
-     * Do a first sanity check on whatever comes out of the CSV file.
-     *
-     * @param array $line
-     *
-     * @return array
+     * @param Reader $reader
      */
-    private function sanitize(array $line): array
+    public function setReader(Reader $reader): void
     {
-        $lineValues = array_values($line);
-        array_walk(
-            $lineValues, static function ($element) {
-            return trim(str_replace('&nbsp;', ' ', (string) $element));
-        }
-        );
+        $this->reader = $reader;
+    }
 
-        return $lineValues;
+    /**
+     * @param array $specifics
+     */
+    public function setSpecifics(array $specifics): void
+    {
+        $this->specifics = $specifics;
     }
 
 }

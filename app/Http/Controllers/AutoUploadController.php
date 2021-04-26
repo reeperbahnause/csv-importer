@@ -10,7 +10,6 @@ use App\Console\StartImport;
 use App\Console\VerifyJSON;
 use App\Exceptions\ImportException;
 use App\Http\Request\AutoUploadRequest;
-use Illuminate\Http\Request;
 use Log;
 
 /**
@@ -46,6 +45,14 @@ class AutoUploadController extends Controller
     /**
      * @inheritDoc
      */
+    public function line(string $string)
+    {
+        echo sprintf("%s: %s\n", date('Y-m-d H:i:s'), $string);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function error($string, $verbosity = null)
     {
         $this->line($string);
@@ -67,13 +74,5 @@ class AutoUploadController extends Controller
     public function info($string, $verbosity = null)
     {
         $this->line($string);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function line(string $string)
-    {
-        echo sprintf("%s: %s\n", date('Y-m-d H:i:s'), $string);
     }
 }

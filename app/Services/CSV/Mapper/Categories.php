@@ -29,6 +29,7 @@ use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Model\Category;
 use GrumpyDictator\FFIIIApiSupport\Request\GetCategoriesRequest;
 use Log;
+
 /**
  * Class Categories
  */

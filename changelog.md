@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.5.2 - 2020-04-xx
+
+### Fixed
+
+- [Issue 4714](https://github.com/firefly-iii/firefly-iii/issues/4714) Bad count in line numbers.
+
 ## 2.5.1 - 2021-04-11
 
 ### Added

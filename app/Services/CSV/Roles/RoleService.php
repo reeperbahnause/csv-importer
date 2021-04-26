@@ -37,23 +37,23 @@ use Log;
  */
 class RoleService
 {
-    public const EXAMPLE_LENGTH = 26;
     public const EXAMPLE_COUNT  = 7;
+    public const EXAMPLE_LENGTH = 26;
 
     /**
      * @param string        $content
      * @param Configuration $configuration
      *
-     * @throws Exception
      * @return array
+     * @throws Exception
      */
     public static function getColumns(string $content, Configuration $configuration): array
     {
-        $reader  = Reader::createFromString($content);
+        $reader = Reader::createFromString($content);
 
         // configure reader:
         $delimiter = $configuration->getDelimiter();
-        switch($delimiter) {
+        switch ($delimiter) {
             default:
             case 'comma':
                 $reader->setDelimiter(',');
@@ -117,12 +117,12 @@ class RoleService
      * @param string        $content
      * @param Configuration $configuration
      *
-     * @throws Exception
      * @return array
+     * @throws Exception
      */
     public static function getExampleData(string $content, Configuration $configuration): array
     {
-        $reader   = Reader::createFromString($content);
+        $reader = Reader::createFromString($content);
 
         // configure reader:
         $delimiter = $configuration->getDelimiter();
