@@ -81,6 +81,7 @@ class IngDescription implements SpecificInterface
                 case 'OV':                               // Overschrijving
                 case 'VZ':                               // Verzamelbetaling
                 case 'IC':                               // Incasso
+                case 'ID':                               // iDEAL
                 case 'DV':                               // Divers
                     $this->removeIBANIngDescription();   // Remove "IBAN:", because it is already at "Tegenrekening"
                     $this->removeNameIngDescription();   // Remove "Naam:", because it is already at "Naam/ Omschrijving"
