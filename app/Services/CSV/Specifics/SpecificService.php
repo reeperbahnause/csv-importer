@@ -51,26 +51,6 @@ class SpecificService
     }
 
     /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public static function exists(string $name): bool
-    {
-        return class_exists(self::fullClass($name));
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public static function fullClass(string $name): string
-    {
-        return sprintf('App\\Services\\CSV\\Specifics\\%s', $name);
-    }
-
-    /**
      * @param array $row
      * @param array $specifics
      *
@@ -108,6 +88,26 @@ class SpecificService
         }
 
         return $row;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function exists(string $name): bool
+    {
+        return class_exists(self::fullClass($name));
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public static function fullClass(string $name): string
+    {
+        return sprintf('App\\Services\\CSV\\Specifics\\%s', $name);
     }
 
 }

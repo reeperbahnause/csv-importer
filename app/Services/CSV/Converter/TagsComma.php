@@ -43,6 +43,7 @@ class TagsComma implements ConverterInterface
 
         return explode(',', $string);
     }
+
     /**
      * Add extra configuration parameters.
      *

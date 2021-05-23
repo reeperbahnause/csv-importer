@@ -43,6 +43,7 @@ class TagsSpace implements ConverterInterface
 
         return explode(' ', $string);
     }
+
     /**
      * Add extra configuration parameters.
      *

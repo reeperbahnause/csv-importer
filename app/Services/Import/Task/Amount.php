@@ -45,26 +45,6 @@ class Amount extends AbstractTask
     }
 
     /**
-     * @param string $amount
-     *
-     * @return bool
-     */
-    private function validAmount(string $amount): bool
-    {
-        if ('' === $amount) {
-            return false;
-        }
-        if ('0' === $amount) {
-            return false;
-        }
-        if (0 === bccomp('0', $amount)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * @param array $transaction
      *
      * @return array
@@ -130,6 +110,26 @@ class Amount extends AbstractTask
             $transaction['type'] = 'deposit';
         }
         return $transaction;
+    }
+
+    /**
+     * @param string $amount
+     *
+     * @return bool
+     */
+    private function validAmount(string $amount): bool
+    {
+        if ('' === $amount) {
+            return false;
+        }
+        if ('0' === $amount) {
+            return false;
+        }
+        if (0 === bccomp('0', $amount)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -125,16 +125,16 @@ class ColumnValueConverter
                 throw new UnexpectedValueException(sprintf('No place for role "%s"', $value->getRole()));
             }
             if (null === $parsedValue) {
-                Log::debug(sprintf('Skip column #%d with role "%s" (in field "%s")', $columnIndex+1, $role, $transactionField));
+                Log::debug(sprintf('Skip column #%d with role "%s" (in field "%s")', $columnIndex + 1, $role, $transactionField));
                 continue;
             }
             Log::debug(
-                sprintf('Stored column #%d with value "%s" and role "%s" in field "%s"', $columnIndex+1, $this->toString($parsedValue), $role, $transactionField)
+                sprintf('Stored column #%d with value "%s" and role "%s" in field "%s"', $columnIndex + 1, $this->toString($parsedValue), $role, $transactionField)
             );
 
             // if append, append.
             if (true === $value->isAppendValue()) {
-                Log::debug(sprintf('Column #%d with role "%s" (in field "%s") must be appended to the previous value.', $columnIndex+1, $role, $transactionField), [$parsedValue]);
+                Log::debug(sprintf('Column #%d with role "%s" (in field "%s") must be appended to the previous value.', $columnIndex + 1, $role, $transactionField), [$parsedValue]);
                 if (is_array($parsedValue)) {
                     $transaction['transactions'][0][$transactionField] = $transaction['transactions'][0][$transactionField] ?? [];
                     $transaction['transactions'][0][$transactionField] = array_merge($transaction['transactions'][0][$transactionField], $parsedValue);
@@ -150,7 +150,7 @@ class ColumnValueConverter
             }
             // if not, not.
             if (false === $value->isAppendValue()) {
-                Log::debug(sprintf('Column #%d with role "%s" (in field "%s") must NOT be appended to the previous value.', $columnIndex+1, $role, $transactionField));
+                Log::debug(sprintf('Column #%d with role "%s" (in field "%s") must NOT be appended to the previous value.', $columnIndex + 1, $role, $transactionField));
                 $transaction['transactions'][0][$transactionField] = $parsedValue;
             }
         }
@@ -170,7 +170,7 @@ class ColumnValueConverter
             return json_encode($value, JSON_THROW_ON_ERROR, 512);
         }
 
-        return (string)$value;
+        return (string) $value;
     }
 
 }

@@ -36,6 +36,13 @@ interface SpecificInterface
     public static function getDescription(): string;
 
     /**
+     * Get name.
+     *
+     * @return string
+     */
+    public static function getName(): string;
+
+    /**
      * If the fix(es) in your file add or remove columns from the CSV content, this must be reflected on the header row
      * as well.
      *
@@ -44,13 +51,6 @@ interface SpecificInterface
      * @return array
      */
     public function runOnHeaders(array $headers): array;
-
-    /**
-     * Get name.
-     *
-     * @return string
-     */
-    public static function getName(): string;
 
     /**
      * Run the fix(es) on a single line of CSV file.

@@ -28,25 +28,22 @@ namespace App\Services\Session;
  */
 class Constants
 {
-    /** @var string  */
-    public const HAS_UPLOAD = 'has_uploaded_file';
-    /** @var string  */
-    public const UPLOAD_CSV_FILE = 'csv_file_path';
-    /** @var string  */
-    public const UPLOAD_CONFIG_FILE = 'config_file_path';
-    /** @var string  */
-    public const CONFIGURATION = 'configuration';
-    /** @var string  */
-    public const CONFIG_COMPLETE_INDICATOR = 'config_complete';
-    /** @var string string */
-    public const ROLES_COMPLETE_INDICATOR = 'role_config_complete';
-
     /** @var string */
-    public const MAPPING_COMPLETE_INDICATOR = 'mapping_config_complete';
-
+    public const CONFIGURATION = 'configuration';
+    /** @var string */
+    public const CONFIG_COMPLETE_INDICATOR = 'config_complete';
+    /** @var string */
+    public const HAS_UPLOAD = 'has_uploaded_file';
+    public const JOB_IDENTIFIER = 'import_job_id';
     /** @var string */
     public const JOB_STATUS = 'import_job_status';
-
-    public const JOB_IDENTIFIER = 'import_job_id';
+    /** @var string */
+    public const MAPPING_COMPLETE_INDICATOR = 'mapping_config_complete';
+    /** @var string string */
+    public const ROLES_COMPLETE_INDICATOR = 'role_config_complete';
+    /** @var string */
+    public const UPLOAD_CONFIG_FILE = 'config_file_path';
+    /** @var string */
+    public const UPLOAD_CSV_FILE = 'csv_file_path';
 
 }

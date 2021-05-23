@@ -25,9 +25,9 @@ namespace App\Console;
 
 use App\Exceptions\ImportException;
 use App\Mail\ImportFinished;
+use Illuminate\Support\Facades\Mail;
 use JsonException;
 use Log;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * Trait AutoImports
@@ -79,6 +79,24 @@ trait AutoImports
         return strtolower($parts[count($parts) - 1]);
     }
 
+    /**
+     * @param string $file
+     *
+     * @return bool
+     */
+    private function hasJsonConfiguration(string $file): bool
+    {
+        $short    = substr($file, 0, -4);
+        $jsonFile = sprintf('%s.json', $short);
+        $fullJson = sprintf('%s/%s', $this->directory, $jsonFile);
+        if (!file_exists($fullJson)) {
+            $this->warn(sprintf('Can\'t find JSON file "%s" expected to go with CSV file "%s". CSV file will be ignored.', $fullJson, $file));
+
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * @param array $files
@@ -92,7 +110,6 @@ trait AutoImports
             $this->importFile($file);
         }
     }
-
 
     /**
      * @param string $file
@@ -197,25 +214,5 @@ trait AutoImports
             Log::debug('SEND MAIL');
             Mail::to(config('mail.destination'))->send(new ImportFinished($log));
         }
-    }
-
-
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    private function hasJsonConfiguration(string $file): bool
-    {
-        $short    = substr($file, 0, -4);
-        $jsonFile = sprintf('%s.json', $short);
-        $fullJson = sprintf('%s/%s', $this->directory, $jsonFile);
-        if (!file_exists($fullJson)) {
-            $this->warn(sprintf('Can\'t find JSON file "%s" expected to go with CSV file "%s". CSV file will be ignored.', $fullJson, $file));
-
-            return false;
-        }
-
-        return true;
     }
 }

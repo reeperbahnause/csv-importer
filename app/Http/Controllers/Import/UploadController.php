@@ -74,16 +74,16 @@ class UploadController extends Controller
         }
 
         // upload the file to a temp directory and use it from there.
-        if (null !== $csvFile && 0 === $errorNumber) {
+        if (0 === $errorNumber) {
             $content = file_get_contents($csvFile->getPathname());
 
             // https://stackoverflow.com/questions/11066857/detect-eol-type-using-php
             // because apparantly there are banks that use "\r" as newline. Looking at the morons of KBC Bank, Belgium.
             // This one is for you: 🤦‍♀️
             $eol = $this->detectEOL($content);
-            if("\r" === $eol) {
+            if ("\r" === $eol) {
                 Log::error('You bank is dumb. Tell them to fix their CSV files.');
-                $content = str_replace("\r","\n", $content);
+                $content = str_replace("\r", "\n", $content);
             }
 
             $csvFileName = StorageService::storeContent($content);
@@ -115,11 +115,11 @@ class UploadController extends Controller
             }
         }
         // if no uploaded config file, read and use the submitted existing file, if any.
-        $existingFile = (string)$request->get('existing_config');
+        $existingFile = (string) $request->get('existing_config');
 
         if (null === $configFile && '' !== $existingFile) {
             Log::debug('User selected a config file from the store.');
-            $disk = Storage::disk('configurations');
+            $disk           = Storage::disk('configurations');
             $configFileName = StorageService::storeContent($disk->get($existingFile));
 
             session()->put(Constants::UPLOAD_CONFIG_FILE, $configFileName);
@@ -139,6 +139,7 @@ class UploadController extends Controller
 
         return redirect(route('import.configure.index'));
     }
+
     /**
      * @param int $error
      *

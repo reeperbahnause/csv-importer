@@ -41,6 +41,7 @@ class Description implements ConverterInterface
     {
         return $value;
     }
+
     /**
      * Add extra configuration parameters.
      *

@@ -31,6 +31,7 @@ use App\Services\CSV\Configuration\Configuration;
 use App\Services\CSV\Roles\RoleService;
 use App\Services\Session\Constants;
 use App\Services\Storage\StorageService;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -42,20 +43,20 @@ use Log;
  */
 class RoleController extends Controller
 {
-        /**
-         * RoleController constructor.
-         */
-        public function __construct()
-        {
-            parent::__construct();
-            app('view')->share('pageTitle', 'Define roles');
-            $this->middleware(RolesComplete::class);
-        }
+    /**
+     * RoleController constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        app('view')->share('pageTitle', 'Define roles');
+        $this->middleware(RolesComplete::class);
+    }
 
     /**
-     * @throws Exception
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      * @return Factory|View
+     * @throws FileNotFoundException
+     * @throws Exception
      */
     public function index()
     {
@@ -84,7 +85,7 @@ class RoleController extends Controller
 
         return view(
             'import.roles.index',
-            compact('mainTitle','configuration', 'subTitle', 'columns', 'examples', 'roles', 'configuredRoles', 'configuredDoMapping', 'mapping')
+            compact('mainTitle', 'configuration', 'subTitle', 'columns', 'examples', 'roles', 'configuredRoles', 'configuredDoMapping', 'mapping')
         );
     }
 

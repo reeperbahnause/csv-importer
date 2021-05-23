@@ -31,9 +31,9 @@ interface ConverterInterface
     /**
      * Convert a value.
      *
+     * @param $value
      * @return mixed
      *
-     * @param $value
      */
     public function convert($value);
 

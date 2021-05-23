@@ -32,6 +32,8 @@ use UnexpectedValueException;
  */
 class Configuration
 {
+    /** @var int */
+    public const VERSION = 2;
     private string $date;
     private int    $defaultAccount;
     private string $delimiter;
@@ -43,23 +45,18 @@ class Configuration
     private int    $version;
     private array  $doMapping;
     private bool   $addImportTag;
-    private array  $mapping;
 
     // how to do double transaction detection?
-    private string $duplicateDetectionMethod; // 'classic' or 'cell'
+        private array  $mapping; // 'classic' or 'cell'
 
     // configuration for "classic" method:
+private string $duplicateDetectionMethod;
     private bool $ignoreDuplicateTransactions;
-    private bool $ignoreDuplicateLines;
 
     // configuration for "cell" method:
+    private bool $ignoreDuplicateLines;
     private int    $uniqueColumnIndex;
     private string $uniqueColumnType;
-
-
-    /** @var int */
-    public const VERSION = 2;
-
 
     /**
      * Configuration constructor.
@@ -93,32 +90,6 @@ class Configuration
     }
 
     /**
-     * @return bool
-     */
-    public function isSkipForm(): bool
-    {
-        return $this->skipForm;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasSpecific(string $name): bool
-    {
-        return in_array($name, $this->specifics, true);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAddImportTag(): bool
-    {
-        return $this->addImportTag;
-    }
-
-    /**
      * Create a standard empty configuration.
      *
      * @return static
@@ -126,97 +97,6 @@ class Configuration
     public static function make(): self
     {
         return new self;
-    }
-
-    /**
-     * @param array $array
-     *
-     * @return static
-     */
-    public static function fromArray(array $array): self
-    {
-        $version                = $array['version'] ?? 1;
-        $delimiters             = config('csv_importer.delimiters_reversed');
-        $object                 = new self;
-        $object->headers        = $array['headers'];
-        $object->date           = $array['date'];
-        $object->defaultAccount = $array['default_account'];
-        $object->delimiter      = $delimiters[$array['delimiter']] ?? 'comma';
-        $object->rules          = $array['rules'];
-        $object->skipForm       = $array['skip_form'];
-        $object->addImportTag   = $array['add_import_tag'] ?? true;
-        $object->specifics      = $array['specifics'];
-        $object->roles          = $array['roles'];
-        $object->mapping        = $array['mapping'] ?? [];
-        $object->doMapping      = $array['do_mapping'];
-        $object->version        = $version;
-
-        // duplicate transaction detection
-        $object->duplicateDetectionMethod = $array['duplicate_detection_method'] ?? 'classic';
-
-        // config for "classic":
-        $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
-        $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
-
-        // overrule a setting:
-        if ('none' === $object->duplicateDetectionMethod) {
-            $object->ignoreDuplicateTransactions = false;
-        }
-
-        // config for "cell":
-        $object->uniqueColumnIndex = $array['unique_column_index'] ?? 0;
-        $object->uniqueColumnType  = $array['unique_column_type'] ?? '';
-
-        $firstValue = count(array_values($array['specifics'])) > 0 ? array_values($array['specifics'])[0] : null;
-        $firstKey   = count(array_values($array['specifics'])) > 0 ? array_keys($array['specifics'])[0] : null;
-
-        // due to a bug, the "specifics" array could still be broken at this point.
-        // do a quick check and verification.
-        if (is_bool($firstValue) && is_string($firstKey)) {
-            $actualSpecifics = [];
-            foreach ($array['specifics'] as $key => $value) {
-                if (true === $value) {
-                    $actualSpecifics[] = $key;
-                }
-            }
-            $object->specifics = $actualSpecifics;
-        }
-
-
-        return $object;
-    }
-
-
-    /**
-     * @param array $roles
-     */
-    public function setRoles(array $roles): void
-    {
-        $this->roles = $roles;
-    }
-
-    /**
-     * @param array $doMapping
-     */
-    public function setDoMapping(array $doMapping): void
-    {
-        $this->doMapping = $doMapping;
-    }
-
-    /**
-     * @param array $mapping
-     */
-    public function setMapping(array $mapping): void
-    {
-        $this->mapping = $mapping;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRoles(): array
-    {
-        return $this->roles ?? [];
     }
 
     /**
@@ -264,6 +144,28 @@ class Configuration
         }
 
         return $object;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return $this
+     */
+    public static function fromFile(array $data): self
+    {
+        Log::debug('Now in Configuration::fromFile', $data);
+        $version = $data['version'] ?? 1;
+        if (1 === $version) {
+            Log::debug('v1, going for classic.');
+
+            return self::fromClassicFile($data);
+        }
+        if (2 === $version) {
+            Log::debug('v2 config file!');
+
+            return self::fromVersionTwo($data);
+        }
+        throw new UnexpectedValueException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
     }
 
     /**
@@ -352,23 +254,120 @@ class Configuration
     /**
      * @param array $data
      *
-     * @return $this
+     * @return static
      */
-    public static function fromFile(array $data): self
+    private static function fromVersionTwo(array $data): self
     {
-        Log::debug('Now in Configuration::fromFile', $data);
-        $version = $data['version'] ?? 1;
-        if (1 === $version) {
-            Log::debug('v1, going for classic.');
+        return self::fromArray($data);
+    }
 
-            return self::fromClassicFile($data);
-        }
-        if (2 === $version) {
-            Log::debug('v2 config file!');
+    /**
+     * @param array $array
+     *
+     * @return static
+     */
+    public static function fromArray(array $array): self
+    {
+        $version                = $array['version'] ?? 1;
+        $delimiters             = config('csv_importer.delimiters_reversed');
+        $object                 = new self;
+        $object->headers        = $array['headers'];
+        $object->date           = $array['date'];
+        $object->defaultAccount = $array['default_account'];
+        $object->delimiter      = $delimiters[$array['delimiter']] ?? 'comma';
+        $object->rules          = $array['rules'];
+        $object->skipForm       = $array['skip_form'];
+        $object->addImportTag   = $array['add_import_tag'] ?? true;
+        $object->specifics      = $array['specifics'];
+        $object->roles          = $array['roles'];
+        $object->mapping        = $array['mapping'] ?? [];
+        $object->doMapping      = $array['do_mapping'];
+        $object->version        = $version;
 
-            return self::fromVersionTwo($data);
+        // duplicate transaction detection
+        $object->duplicateDetectionMethod = $array['duplicate_detection_method'] ?? 'classic';
+
+        // config for "classic":
+        $object->ignoreDuplicateLines        = $array['ignore_duplicate_lines'];
+        $object->ignoreDuplicateTransactions = $array['ignore_duplicate_transactions'];
+
+        if (!array_key_exists('duplicate_detection_method', $array)) {
+            if (false === $object->ignoreDuplicateTransactions) {
+                Log::debug('Set the duplicate method to "none".');
+                $object->duplicateDetectionMethod = 'none';
+            }
         }
-        throw new UnexpectedValueException(sprintf('Configuration file version "%s" cannot be parsed.', $version));
+
+        // overrule a setting:
+        if ('none' === $object->duplicateDetectionMethod) {
+            $object->ignoreDuplicateTransactions = false;
+        }
+
+        // config for "cell":
+        $object->uniqueColumnIndex = $array['unique_column_index'] ?? 0;
+        $object->uniqueColumnType  = $array['unique_column_type'] ?? '';
+
+        $firstValue = count(array_values($array['specifics'])) > 0 ? array_values($array['specifics'])[0] : null;
+        $firstKey   = count(array_values($array['specifics'])) > 0 ? array_keys($array['specifics'])[0] : null;
+
+        // due to a bug, the "specifics" array could still be broken at this point.
+        // do a quick check and verification.
+        if (is_bool($firstValue) && is_string($firstKey)) {
+            $actualSpecifics = [];
+            foreach ($array['specifics'] as $key => $value) {
+                if (true === $value) {
+                    $actualSpecifics[] = $key;
+                }
+            }
+            $object->specifics = $actualSpecifics;
+        }
+
+        Log::debug(var_export($object->ignoreDuplicateLines, true));
+        Log::debug(var_export($object->ignoreDuplicateTransactions, true));
+
+        return $object;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSkipForm(): bool
+    {
+        return $this->skipForm;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasSpecific(string $name): bool
+    {
+        return in_array($name, $this->specifics, true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAddImportTag(): bool
+    {
+        return $this->addImportTag;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRoles(): array
+    {
+        return $this->roles ?? [];
+    }
+
+    /**
+     * @param array $roles
+     */
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
     }
 
     /**
@@ -385,16 +384,6 @@ class Configuration
     public function isIgnoreDuplicateTransactions(): bool
     {
         return $this->ignoreDuplicateTransactions;
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return static
-     */
-    private static function fromVersionTwo(array $data): self
-    {
-        return self::fromArray($data);
     }
 
     /**
@@ -481,11 +470,27 @@ class Configuration
     }
 
     /**
+     * @param array $doMapping
+     */
+    public function setDoMapping(array $doMapping): void
+    {
+        $this->doMapping = $doMapping;
+    }
+
+    /**
      * @return array
      */
     public function getMapping(): array
     {
         return $this->mapping ?? [];
+    }
+
+    /**
+     * @param array $mapping
+     */
+    public function setMapping(array $mapping): void
+    {
+        $this->mapping = $mapping;
     }
 
     /**

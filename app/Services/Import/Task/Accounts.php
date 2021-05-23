@@ -59,23 +59,131 @@ class Accounts extends AbstractTask
     }
 
     /**
-     * Returns true if the task requires the default account.
+     * @param array $transaction
      *
-     * @return bool
+     * @return array
      */
-    public function requiresDefaultAccount(): bool
+    private function processTransaction(array $transaction): array
     {
-        return true;
+        Log::debug('Now in Accounts::processTransaction()');
+
+        /*
+         * Try to find the source and destination accounts in the transaction.
+         *
+         * The source account will default back to the user's submitted default account.
+         * So when everything fails, the transaction will be a deposit for amount X.
+         */
+        $sourceArray = $this->getSourceArray($transaction);
+        $destArray   = $this->getDestinationArray($transaction);
+        $source      = $this->findAccount($sourceArray, $this->account);
+        $destination = $this->findAccount($destArray, null);
+
+        /*
+         * First, set source and destination in the transaction array:
+         */
+        $transaction         = $this->setSource($transaction, $source);
+        $transaction         = $this->setDestination($transaction, $destination);
+        $transaction['type'] = $this->determineType($source['type'], $destination['type']);
+
+        $amount = (string) $transaction['amount'];
+        $amount = '' === $amount ? '0' : $amount;
+
+        if ('0' === $amount) {
+            Log::error('Amount is ZERO. This will give trouble further down the line.');
+        }
+
+        /*
+         * If the amount is positive, the transaction is a deposit. We switch Source
+         * and Destination and see if we can still handle the transaction, but only if the transaction
+         * isn't already a deposit
+         */
+        if ('deposit' !== $transaction['type'] && 1 === bccomp($amount, '0')) {
+            // amount is positive
+            Log::debug(sprintf('%s is positive.', $amount));
+            $transaction         = $this->setSource($transaction, $destination);
+            $transaction         = $this->setDestination($transaction, $source);
+            $transaction['type'] = $this->determineType($destination['type'], $source['type']);
+        }
+        if ('deposit' === $transaction['type'] && 1 === bccomp($amount, '0')) {
+            Log::debug('Transaction is a deposit, and amount is positive. Will not change account types.');
+        }
+
+        /*
+         * Final check. If the type is "withdrawal" but the destination account found is "revenue"
+         * we found the wrong one. Just submit the name and hope for the best.
+         */
+        if ('revenue' === $destination['type'] && 'withdrawal' === $transaction['type']) {
+            Log::warning('The found destination account is of type revenue but this is a withdrawal. Out of cheese error.');
+            Log::debug(
+                sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $destination['name'], $destination['iban'])
+            );
+            $transaction['destination_id']   = null;
+            $transaction['destination_name'] = $destination['name'];
+            $transaction['destination_iban'] = $destination['iban'];
+        }
+
+        /*
+         * Same but for the other way around.
+         * If type is "deposit" but the source account is an expense account.
+         * Submit just the name.
+         */
+        if ('expense' === $source['type'] && 'deposit' === $transaction['type']) {
+            Log::warning('The found source account is of type expense but this is a deposit. Out of cheese error.');
+            Log::debug(sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $source['name'], $source['iban']));
+            $transaction['source_id']   = null;
+            $transaction['source_name'] = $source['name'];
+            $transaction['source_iban'] = $source['iban'];
+        }
+
+        /*
+         * if new source or destination ID is filled in, drop the other fields:
+         */
+        if (0 !== $transaction['source_id'] && null !== $transaction['source_id']) {
+            $transaction['source_name']   = null;
+            $transaction['source_iban']   = null;
+            $transaction['source_number'] = null;
+        }
+        if (0 !== $transaction['destination_id'] && null !== $transaction['destination_id']) {
+            $transaction['destination_name']   = null;
+            $transaction['destination_iban']   = null;
+            $transaction['destination_number'] = null;
+        }
+
+        return $transaction;
     }
 
     /**
-     * Returns true if the task requires the default currency of the user.
+     * @param array $transaction
      *
-     * @return bool
+     * @return array
      */
-    public function requiresTransactionCurrency(): bool
+    private function getSourceArray(array $transaction): array
     {
-        return false;
+        return [
+            'transaction_type' => $transaction['type'],
+            'id'               => $transaction['source_id'],
+            'name'             => $transaction['source_name'],
+            'iban'             => $transaction['source_iban'] ?? null,
+            'number'           => $transaction['source_number'] ?? null,
+            'bic'              => $transaction['source_bic'] ?? null,
+        ];
+    }
+
+    /**
+     * @param array $transaction
+     *
+     * @return array
+     */
+    private function getDestinationArray(array $transaction): array
+    {
+        return [
+            'transaction_type' => $transaction['type'],
+            'id'               => $transaction['destination_id'],
+            'name'             => $transaction['destination_name'],
+            'iban'             => $transaction['destination_iban'] ?? null,
+            'number'           => $transaction['destination_number'] ?? null,
+            'bic'              => $transaction['destination_bic'] ?? null,
+        ];
     }
 
     /**
@@ -160,40 +268,6 @@ class Accounts extends AbstractTask
     }
 
     /**
-     * @param array $transaction
-     *
-     * @return array
-     */
-    private function getDestinationArray(array $transaction): array
-    {
-        return [
-            'transaction_type' => $transaction['type'],
-            'id'               => $transaction['destination_id'],
-            'name'             => $transaction['destination_name'],
-            'iban'             => $transaction['destination_iban'] ?? null,
-            'number'           => $transaction['destination_number'] ?? null,
-            'bic'              => $transaction['destination_bic'] ?? null,
-        ];
-    }
-
-    /**
-     * @param array $transaction
-     *
-     * @return array
-     */
-    private function getSourceArray(array $transaction): array
-    {
-        return [
-            'transaction_type' => $transaction['type'],
-            'id'               => $transaction['source_id'],
-            'name'             => $transaction['source_name'],
-            'iban'             => $transaction['source_iban'] ?? null,
-            'number'           => $transaction['source_number'] ?? null,
-            'bic'              => $transaction['source_bic'] ?? null,
-        ];
-    }
-
-    /**
      * @param string $value
      *
      * @return Account|null
@@ -232,7 +306,6 @@ class Accounts extends AbstractTask
 
         return null;
     }
-
 
     /**
      * @param string $iban
@@ -343,7 +416,6 @@ class Accounts extends AbstractTask
         return null;
     }
 
-
     /**
      * @param array $transaction
      * @param array $source
@@ -353,17 +425,6 @@ class Accounts extends AbstractTask
     private function setSource(array $transaction, array $source): array
     {
         return $this->setTransactionAccount('source', $transaction, $source);
-    }
-
-    /**
-     * @param array $transaction
-     * @param array $source
-     *
-     * @return array
-     */
-    private function setDestination(array $transaction, array $source): array
-    {
-        return $this->setTransactionAccount('destination', $transaction, $source);
     }
 
     /**
@@ -386,96 +447,33 @@ class Accounts extends AbstractTask
 
     /**
      * @param array $transaction
+     * @param array $source
      *
      * @return array
      */
-    private function processTransaction(array $transaction): array
+    private function setDestination(array $transaction, array $source): array
     {
-        Log::debug('Now in Accounts::processTransaction()');
+        return $this->setTransactionAccount('destination', $transaction, $source);
+    }
 
-        /*
-         * Try to find the source and destination accounts in the transaction.
-         *
-         * The source account will default back to the user's submitted default account.
-         * So when everything fails, the transaction will be a deposit for amount X.
-         */
-        $sourceArray = $this->getSourceArray($transaction);
-        $destArray   = $this->getDestinationArray($transaction);
-        $source      = $this->findAccount($sourceArray, $this->account);
-        $destination = $this->findAccount($destArray, null);
+    /**
+     * Returns true if the task requires the default account.
+     *
+     * @return bool
+     */
+    public function requiresDefaultAccount(): bool
+    {
+        return true;
+    }
 
-        /*
-         * First, set source and destination in the transaction array:
-         */
-        $transaction         = $this->setSource($transaction, $source);
-        $transaction         = $this->setDestination($transaction, $destination);
-        $transaction['type'] = $this->determineType($source['type'], $destination['type']);
-
-        $amount = (string) $transaction['amount'];
-        $amount = '' === $amount ? '0' : $amount;
-
-        if ('0' === $amount) {
-            Log::error('Amount is ZERO. This will give trouble further down the line.');
-        }
-
-        /*
-         * If the amount is positive, the transaction is a deposit. We switch Source
-         * and Destination and see if we can still handle the transaction, but only if the transaction
-         * isn't already a deposit
-         */
-        if ('deposit' !== $transaction['type'] && 1 === bccomp($amount, '0')) {
-            // amount is positive
-            Log::debug(sprintf('%s is positive.', $amount));
-            $transaction         = $this->setSource($transaction, $destination);
-            $transaction         = $this->setDestination($transaction, $source);
-            $transaction['type'] = $this->determineType($destination['type'], $source['type']);
-        }
-        if ('deposit' === $transaction['type'] && 1 === bccomp($amount, '0')) {
-            Log::debug('Transaction is a deposit, and amount is positive. Will not change account types.');
-        }
-
-        /*
-         * Final check. If the type is "withdrawal" but the destination account found is "revenue"
-         * we found the wrong one. Just submit the name and hope for the best.
-         */
-        if ('revenue' === $destination['type'] && 'withdrawal' === $transaction['type']) {
-            Log::warning('The found destination account is of type revenue but this is a withdrawal. Out of cheese error.');
-            Log::debug(
-                sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $destination['name'], $destination['iban'])
-            );
-            $transaction['destination_id']   = null;
-            $transaction['destination_name'] = $destination['name'];
-            $transaction['destination_iban'] = $destination['iban'];
-        }
-
-        /*
-         * Same but for the other way around.
-         * If type is "deposit" but the source account is an expense account.
-         * Submit just the name.
-         */
-        if ('expense' === $source['type'] && 'deposit' === $transaction['type']) {
-            Log::warning('The found source account is of type expense but this is a deposit. Out of cheese error.');
-            Log::debug(sprintf('CSV importer will submit name "%s" and IBAN "%s" and let Firefly III sort it out.', $source['name'], $source['iban']));
-            $transaction['source_id']   = null;
-            $transaction['source_name'] = $source['name'];
-            $transaction['source_iban'] = $source['iban'];
-        }
-
-        /*
-         * if new source or destination ID is filled in, drop the other fields:
-         */
-        if (0 !== $transaction['source_id'] && null !== $transaction['source_id']) {
-            $transaction['source_name']   = null;
-            $transaction['source_iban']   = null;
-            $transaction['source_number'] = null;
-        }
-        if (0 !== $transaction['destination_id'] && null !== $transaction['destination_id']) {
-            $transaction['destination_name']   = null;
-            $transaction['destination_iban']   = null;
-            $transaction['destination_number'] = null;
-        }
-
-        return $transaction;
+    /**
+     * Returns true if the task requires the default currency of the user.
+     *
+     * @return bool
+     */
+    public function requiresTransactionCurrency(): bool
+    {
+        return false;
     }
 
 

@@ -41,6 +41,7 @@ class CleanNlString implements ConverterInterface
     {
         return app('steam')->cleanString($value);
     }
+
     /**
      * Add extra configuration parameters.
      *

@@ -44,10 +44,10 @@ class Budgets implements MapperInterface
      */
     public function getMap(): array
     {
-        $result   = [];
+        $result  = [];
         $url     = Token::getURL();
         $token   = Token::getAccessToken();
-        $request  = new GetBudgetsRequest($url, $token);
+        $request = new GetBudgetsRequest($url, $token);
 
         $request->setVerify(config('csv_importer.connection.verify'));
         $request->setTimeOut(config('csv_importer.connection.timeout'));

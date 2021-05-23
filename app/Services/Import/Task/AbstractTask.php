@@ -54,5 +54,4 @@ abstract class AbstractTask implements TaskInterface
     }
 
 
-
 }

@@ -165,7 +165,7 @@
                                         <option label="Identifier-based" {% if configuration.getDuplicateDetectionMethod == 'cell' %}selected{% endif %} value="cell">Identifier-based detection</option>
                                     </select>
                                     <small id="duplicate_detection_method_help" class="form-text text-muted">
-                                        For more details on these detection method see <a href="https://docs.firefly-iii.org/csv/usage/configure/" target="_blank">the documentation</a>. If you're not sure, select "content-based" detection.
+                                        For more details on these detection method see <a href="https://docs.firefly-iii.org/csv/usage/configure/#duplicate-transaction-detection" target="_blank">the documentation</a>. If you're not sure, select "content-based" detection.
                                     </small>
                                 </div>
                             </div>
@@ -173,7 +173,7 @@
 
 
 
-                            <div class="form-group row">
+                            <div class="form-group row" id="unique_column_index_holder">
                                 <label for="unique_column_index" class="col-sm-3 col-form-label">Unique column index</label>
                                 <div class="col-sm-9">
                                     <input type="number" step="1" name="unique_column_index" class="form-control" id="unique_column_index" placeholder="Column index" value="{{ configuration.getUniqueColumnIndex }}" aria-describedby="unique_column_index_help">
@@ -183,7 +183,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group row">
+                            <div class="form-group row" id="unique_column_type_holder">
                                 <label for="unique_column_type" class="col-sm-3 col-form-label">Unique column type</label>
                                 <div class="col-sm-9">
                                     <select id="unique_column_type" name="unique_column_type" class="form-control" aria-describedby="unique_column_type_help">
@@ -263,10 +263,37 @@
 {% block scripts %}
     <script type="text/javascript">
 
+        // some basic triggers for the duplicate options.
+
         var phpFormatRoute = '{{ route('import.configure.php_date') }}';
         $( document ).ready(function() {
             updateDateExample();
+            linkToTriggers();
+            triggerDetectionMethod();
         });
+
+        function linkToTriggers() {
+            $('#duplicate_detection_method').on('change', triggerDetectionMethod);
+        }
+
+        function triggerDetectionMethod() {
+            var value = $('#duplicate_detection_method').val();
+            console.log('trigger change, value is')
+            console.log(value);
+            if('none' === value) {
+                $('#unique_column_index_holder').hide();
+                $('#unique_column_type_holder').hide();
+            }
+            if('classic' === value) {
+                $('#unique_column_index_holder').hide();
+                $('#unique_column_type_holder').hide();
+            }
+            if('cell' === value) {
+                $('#unique_column_index_holder').show();
+                $('#unique_column_type_holder').show();
+            }
+        }
+
         function updateDateExample() {
             $('#date_example').text('...');
             var format = $('#date').val();

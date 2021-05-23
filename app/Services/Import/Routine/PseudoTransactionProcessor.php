@@ -69,35 +69,14 @@ class PseudoTransactionProcessor
     }
 
     /**
-     * @param array $lines
-     *
-     * @return array
-     */
-    public function processPseudo(array $lines): array
-    {
-        Log::debug(sprintf('Now in %s', __METHOD__));
-        $count     = count($lines);
-        $processed = [];
-        Log::info(sprintf('Converting %d lines into transactions.', $count));
-        /** @var array $line */
-        foreach ($lines as $line) {
-            $processed[] = $this->processPseudoLine($line);
-        }
-        Log::info(sprintf('Done converting %d lines into transactions.', $count));
-
-        return $processed;
-
-    }
-
-    /**
      * @param int|null $accountId
      *
      * @throws ImportException
      */
     private function getDefaultAccount(?int $accountId): void
     {
-        $url     = Token::getURL();
-        $token   = Token::getAccessToken();
+        $url   = Token::getURL();
+        $token = Token::getAccessToken();
 
         if (null !== $accountId) {
             $accountRequest = new GetAccountRequest($url, $token);
@@ -120,8 +99,8 @@ class PseudoTransactionProcessor
      */
     private function getDefaultCurrency(): void
     {
-        $url     = Token::getURL();
-        $token   = Token::getAccessToken();
+        $url   = Token::getURL();
+        $token = Token::getAccessToken();
 
         $prefRequest = new GetPreferenceRequest($url, $token);
         $prefRequest->setVerify(config('csv_importer.connection.verify'));
@@ -136,7 +115,7 @@ class PseudoTransactionProcessor
             throw new ImportException('Could not load the users currency preference.');
         }
         $code            = $response->getPreference()->data ?? 'EUR';
-        $currencyRequest = new GetCurrencyRequest($url,$token);
+        $currencyRequest = new GetCurrencyRequest($url, $token);
         $currencyRequest->setVerify(config('csv_importer.connection.verify'));
         $currencyRequest->setTimeOut(config('csv_importer.connection.timeout'));
         $currencyRequest->setCode($code);
@@ -148,6 +127,27 @@ class PseudoTransactionProcessor
             Log::error($e->getMessage());
             throw new ImportException(sprintf('The default currency ("%s") could not be loaded.', $code));
         }
+    }
+
+    /**
+     * @param array $lines
+     *
+     * @return array
+     */
+    public function processPseudo(array $lines): array
+    {
+        Log::debug(sprintf('Now in %s', __METHOD__));
+        $count     = count($lines);
+        $processed = [];
+        Log::info(sprintf('Converting %d lines into transactions.', $count));
+        /** @var array $line */
+        foreach ($lines as $line) {
+            $processed[] = $this->processPseudoLine($line);
+        }
+        Log::info(sprintf('Done converting %d lines into transactions.', $count));
+
+        return $processed;
+
     }
 
     /**

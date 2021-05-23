@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Artisan;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,7 +50,7 @@ class IndexController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Foundation\Application|Factory|RedirectResponse|Redirector|View
+     * @return Application|Factory|RedirectResponse|Redirector|View
      */
     public function index(Request $request)
     {

@@ -40,8 +40,8 @@ class ConfigFileProcessor
      *
      * @param string $fileName
      *
-     * @throws ImportException
      * @return Configuration
+     * @throws ImportException
      */
     public static function convertConfigFile(string $fileName): Configuration
     {

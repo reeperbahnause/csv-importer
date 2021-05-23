@@ -44,6 +44,7 @@ class CleanString implements ConverterInterface
         // also remove newlines:
         return trim(str_replace("\n", '', $value));
     }
+
     /**
      * Add extra configuration parameters.
      *

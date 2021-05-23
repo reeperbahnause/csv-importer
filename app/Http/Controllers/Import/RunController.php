@@ -95,9 +95,9 @@ class RunController extends Controller
     /**
      * @param Request $request
      *
-     * @throws JsonException
-     * @throws JsonException
      * @return JsonResponse
+     * @throws JsonException
+     * @throws JsonException
      */
     public function start(Request $request): JsonResponse
     {
@@ -113,7 +113,7 @@ class RunController extends Controller
             $routine->setConfiguration(Configuration::fromArray(session()->get(Constants::CONFIGURATION)));
             $routine->setReader(FileReader::getReaderFromSession());
             $routine->start();
-        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (ImportException|ErrorException|TypeError $e) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */ catch (ImportException | ErrorException | TypeError $e) {
             // update job to error state.
             ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_ERRORED);
             $error = sprintf('Internal error: %s in file %s:%d', $e->getMessage(), $e->getFile(), $e->getLine());
@@ -148,8 +148,8 @@ class RunController extends Controller
     /**
      * @param Request $request
      *
-     * @throws JsonException
      * @return JsonResponse
+     * @throws JsonException
      */
     public function status(Request $request): JsonResponse
     {
