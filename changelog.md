@@ -5,12 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.5.2 - 2020-05-23
 
 ### Fixed
-
 - [Issue 4714](https://github.com/firefly-iii/firefly-iii/issues/4714) Bad count in line numbers.
 - [PR 147](https://github.com/firefly-iii/csv-importer/pull/147) Vanity URL in messages.
-
-### Added
-- Initial release.
 
 ### Changed
 - Some textual changes.
