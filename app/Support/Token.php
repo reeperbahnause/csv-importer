@@ -64,4 +64,20 @@ class Token
         return (string) $value;
     }
 
+    /**
+     * @return string
+     * @throws ImportException
+     */
+    public static function getVanityURL(): string
+    {
+        $value = request()->cookie('vanity_url');
+        if (null === $value) {
+            $value = self::getURL();
+        }
+        if ('' === (string) $value) {
+            throw new ImportException('No valid URL value.');
+        }
+        return (string) $value;
+    }
+
 }
