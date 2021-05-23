@@ -49,7 +49,7 @@ class APISubmitter
     private string        $tag;
     private string        $tagDate;
     private bool          $addTag;
-    private string        $rootURL;
+    private string        $vanityURL;
     private Configuration $configuration;
 
     /**
@@ -62,9 +62,9 @@ class APISubmitter
         $count         = count($lines);
         Log::info(sprintf('Going to submit %d transactions to your Firefly III instance.', $count));
 
-        $this->rootURL = Token::getURL();
+        $this->vanityURL = Token::getVanityURL();
 
-        Log::debug(sprintf('The root URL is "%s"', $this->rootURL));
+        Log::debug(sprintf('Vanity URL : "%s"', $this->vanityURL));
 
         // create the tag, to be used later on.
         $this->createTag();
@@ -163,7 +163,7 @@ class APISubmitter
             $searchResult = $this->searchField($field, $value);
             if (0 !== $searchResult) {
                 Log::debug(sprintf('Looks like field "%s" with value "%s" is not unique, found in group #%d. Return false', $field, $value, $searchResult));
-                $message = sprintf('There is already a transaction with %s "%s" (<a href="%s/transactions/show/%d">link</a>).', $field, $value, $this->rootURL, $searchResult);
+                $message = sprintf('There is already a transaction with %s "%s" (<a href="%s/transactions/show/%d">link</a>).', $field, $value, $this->vanityURL, $searchResult);
                 $this->addError($index, $message);
 
                 return false;
@@ -270,7 +270,7 @@ class APISubmitter
                 $message = sprintf(
                     'Created %s <a target="_blank" href="%s">#%d "%s"</a> (%s %s)',
                     $transaction->type,
-                    sprintf('%s/transactions/show/%d', $this->rootURL, $group->id),
+                    sprintf('%s/transactions/show/%d', $this->vanityURL, $group->id),
                     $group->id,
                     e($transaction->description),
                     $transaction->currencyCode,
