@@ -25,6 +25,7 @@ namespace App\Services\CSV\Converter;
 
 use ErrorException;
 use Log;
+use ValueError;
 
 /**
  * Class Iban
@@ -75,7 +76,7 @@ class Iban implements ConverterInterface
         $iban  = str_replace($search, $replace, $iban);
         try {
             $checksum = bcmod($iban, '97');
-        } catch (ErrorException $e) {
+        } catch (ValueError $e) {
             Log::error(sprintf('Bad IBAN: %s', $e->getMessage()));
             $checksum = 2;
         }
