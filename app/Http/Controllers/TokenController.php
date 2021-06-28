@@ -27,6 +27,7 @@ use App\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Request\SystemInformationRequest;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -283,6 +284,11 @@ class TokenController extends Controller
             Log::error(sprintf('Response from server: "%s"', (string) $response->getBody()));
             Log::error($e->getTraceAsString());
             throw new ApiException(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
+        } catch (ClientException $e) {
+            Log::error(sprintf('Client exception when decoding response: %s', $e->getMessage()));
+            Log::error(sprintf('Response from server: "%s"', (string) $response->getBody()));
+            Log::error($e->getTraceAsString());
+            return view('error')->with('message', $e->getMessage());
         }
         Log::debug('Response', $data);
 
