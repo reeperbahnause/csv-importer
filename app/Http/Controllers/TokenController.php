@@ -275,8 +275,16 @@ class TokenController extends Controller
             'verify'          => config('csv_importer.connection.verify'),
             'connect_timeout' => config('csv_importer.connection.timeout'),
         ];
+        try {
+            $response = (new Client($opts))->post($finalURL, $params);
+        } catch (ClientException $e) {
+            $body = (string) $e->getResponse()->getBody();
+            Log::error(sprintf('Client exception when decoding response: %s', $e->getMessage()));
+            Log::error(sprintf('Response from server: "%s"', $body));
+            Log::error($e->getTraceAsString());
+            return view('error')->with('message', $e->getMessage())->with('body', $body);
+        }
 
-        $response = (new Client($opts))->post($finalURL, $params);
         try {
             $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
@@ -284,11 +292,6 @@ class TokenController extends Controller
             Log::error(sprintf('Response from server: "%s"', (string) $response->getBody()));
             Log::error($e->getTraceAsString());
             throw new ApiException(sprintf('JSON exception when decoding response: %s', $e->getMessage()));
-        } catch (ClientException $e) {
-            Log::error(sprintf('Client exception when decoding response: %s', $e->getMessage()));
-            Log::error(sprintf('Response from server: "%s"', (string) $response->getBody()));
-            Log::error($e->getTraceAsString());
-            return view('error')->with('message', $e->getMessage());
         }
         Log::debug('Response', $data);
 
