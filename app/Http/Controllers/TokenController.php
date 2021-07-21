@@ -27,6 +27,7 @@ use App\Exceptions\ApiException;
 use GrumpyDictator\FFIIIApiSupport\Exceptions\ApiHttpException;
 use GrumpyDictator\FFIIIApiSupport\Request\SystemInformationRequest;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -274,8 +275,16 @@ class TokenController extends Controller
             'verify'          => config('csv_importer.connection.verify'),
             'connect_timeout' => config('csv_importer.connection.timeout'),
         ];
+        try {
+            $response = (new Client($opts))->post($finalURL, $params);
+        } catch (ClientException $e) {
+            $body = (string) $e->getResponse()->getBody();
+            Log::error(sprintf('Client exception when decoding response: %s', $e->getMessage()));
+            Log::error(sprintf('Response from server: "%s"', $body));
+            Log::error($e->getTraceAsString());
+            return view('error')->with('message', $e->getMessage())->with('body', $body);
+        }
 
-        $response = (new Client($opts))->post($finalURL, $params);
         try {
             $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
