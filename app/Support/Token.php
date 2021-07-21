@@ -51,12 +51,11 @@ class Token
      * @return string
      * @throws ImportException
      */
-    public static function getURL(): string
+    public static function getVanityURL(): string
     {
-        $value = request()->cookie('base_url');
+        $value = request()->cookie('vanity_url');
         if (null === $value) {
-            // fall back to config:
-            $value = (string) config('csv_importer.url');
+            $value = self::getURL();
         }
         if ('' === (string) $value) {
             throw new ImportException('No valid URL value.');
@@ -68,11 +67,12 @@ class Token
      * @return string
      * @throws ImportException
      */
-    public static function getVanityURL(): string
+    public static function getURL(): string
     {
-        $value = request()->cookie('vanity_url');
+        $value = request()->cookie('base_url');
         if (null === $value) {
-            $value = self::getURL();
+            // fall back to config:
+            $value = (string) config('csv_importer.url');
         }
         if ('' === (string) $value) {
             throw new ImportException('No valid URL value.');

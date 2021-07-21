@@ -133,7 +133,7 @@ class LineProcessor
             $role        = $this->getRoleForColumn($columnIndex, $mapped);
             $appendValue = config(sprintf('csv_importer.import_roles.%s.append_value', $originalRole));
 
-            if(null === $appendValue) {
+            if (null === $appendValue) {
                 $appendValue = false;
             }
 

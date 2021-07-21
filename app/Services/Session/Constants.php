@@ -33,7 +33,7 @@ class Constants
     /** @var string */
     public const CONFIG_COMPLETE_INDICATOR = 'config_complete';
     /** @var string */
-    public const HAS_UPLOAD = 'has_uploaded_file';
+    public const HAS_UPLOAD     = 'has_uploaded_file';
     public const JOB_IDENTIFIER = 'import_job_id';
     /** @var string */
     public const JOB_STATUS = 'import_job_status';
