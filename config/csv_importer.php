@@ -53,7 +53,7 @@ return [
     'vanity_url'            => envNonEmpty('VANITY_URL'),
     'connection'            => [
         'verify'  => env('VERIFY_TLS_SECURITY', true),
-        'timeout' => 0.0 === (float)env('CONNECTION_TIMEOUT', 31.415) ? 31.415 : (float)env('CONNECTION_TIMEOUT', 31.415),
+        'timeout' => 0.0 === (float) env('CONNECTION_TIMEOUT', 31.415) ? 31.415 : (float) env('CONNECTION_TIMEOUT', 31.415),
     ],
     'trusted_proxies'       => env('TRUSTED_PROXIES', ''),
     'delimiters'            => [
@@ -591,7 +591,7 @@ return [
         'description'        => 'Transaction description',
         'internal_reference' => 'Internal reference',
     ],
-    'search_modifier' => [
+    'search_modifier'       => [
         'note'               => 'notes_are',
         'external-id'        => 'external_id',
         'external_id'        => 'external_id',
