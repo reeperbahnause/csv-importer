@@ -47,14 +47,14 @@ class Configuration
     private bool   $addImportTag;
 
     // how to do double transaction detection?
-        private array  $mapping; // 'classic' or 'cell'
+    private array $mapping; // 'classic' or 'cell'
 
     // configuration for "classic" method:
-private string $duplicateDetectionMethod;
-    private bool $ignoreDuplicateTransactions;
+    private string $duplicateDetectionMethod;
+    private bool   $ignoreDuplicateTransactions;
 
     // configuration for "cell" method:
-    private bool $ignoreDuplicateLines;
+    private bool   $ignoreDuplicateLines;
     private int    $uniqueColumnIndex;
     private string $uniqueColumnType;
 

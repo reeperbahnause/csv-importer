@@ -52,7 +52,7 @@ class IndexController extends Controller
      * @param Request $request
      * @return Application|Factory|RedirectResponse|Redirector|View
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         // check for access token cookie. if not, redirect to flow to get it.
@@ -96,7 +96,7 @@ class IndexController extends Controller
     /**
      * @return RedirectResponse|Redirector
      */
-    public function reset()
+    public function reset(): mixed
     {
         Log::debug(sprintf('Now at %s', __METHOD__));
         session()->forget(['csv_file_path', 'config_file_path', 'import_job_id']);
