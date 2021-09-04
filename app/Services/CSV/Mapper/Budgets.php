@@ -65,6 +65,7 @@ class Budgets implements MapperInterface
         foreach ($response as $budget) {
             $result[$budget->id] = sprintf('%s', $budget->name);
         }
+        asort($result, SORT_STRING);
 
         return $result;
     }

@@ -63,6 +63,7 @@ class Categories implements MapperInterface
         foreach ($response as $category) {
             $result[$category->id] = sprintf('%s', $category->name);
         }
+        asort($result, SORT_STRING);
 
         return $result;
     }

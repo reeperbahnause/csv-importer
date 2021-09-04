@@ -61,6 +61,7 @@ class Bills implements MapperInterface
         foreach ($response as $bill) {
             $result[$bill->id] = sprintf('%s (%s)', $bill->name, $bill->repeat_freq);
         }
+        asort($result, SORT_STRING);
 
         return $result;
     }
