@@ -161,17 +161,29 @@ trait GetAccounts
      */
     protected function mergeAll(array $accounts): array
     {
-        $result = [];
+        $invalidTypes = ['initial-balance', 'reconciliation'];
+        $result       = [];
         /** @var Account $account */
         foreach ($accounts as $account) {
             $name = $account->name;
+
+            // remove some types:
+            if (in_array($account->type, $invalidTypes, true)) {
+                continue;
+            }
+
             if (null !== $account->iban) {
                 $name = sprintf('%s (%s)', $account->name, $account->iban);
             }
+
             // add optgroup to result:
             $group                        = trans(sprintf('import.account_types_%s', $account->type));
             $result[$group]               = $result[$group] ?? [];
             $result[$group][$account->id] = $name;
+        }
+        foreach ($result as $group => $accounts) {
+            asort($accounts, SORT_STRING);
+            $result[$group] = $accounts;
         }
 
         return $result;
@@ -186,17 +198,31 @@ trait GetAccounts
      */
     protected function mergeWithIBAN(array $accounts): array
     {
-        $result = [];
+        $result       = [];
+        $invalidTypes = ['initial-balance', 'reconciliation'];
         /** @var Account $account */
         foreach ($accounts as $account) {
+
+            // remove some types:
+            if (in_array($account->type, $invalidTypes, true)) {
+                continue;
+            }
+
             // only merge if IBAN is not null.
             if (null !== $account->iban) {
+
+
                 $name = sprintf('%s (%s)', $account->name, $account->iban);
                 // add optgroup to result:
                 $group                        = trans(sprintf('import.account_types_%s', $account->type));
                 $result[$group]               = $result[$group] ?? [];
                 $result[$group][$account->id] = $name;
             }
+        }
+
+        foreach ($result as $group => $accounts) {
+            asort($accounts, SORT_STRING);
+            $result[$group] = $accounts;
         }
 
         return $result;

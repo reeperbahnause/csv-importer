@@ -63,6 +63,7 @@ class TransactionCurrencies implements MapperInterface
         foreach ($response as $currency) {
             $result[$currency->id] = sprintf('%s (%s)', $currency->name, $currency->code);
         }
+        asort($result, SORT_STRING);
 
         return $result;
     }
