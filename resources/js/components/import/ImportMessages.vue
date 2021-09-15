@@ -25,9 +25,9 @@
             <strong class="text-danger">Error(s)</strong>
             <ul>
                 <li v-for="(errorList, line) in this.errors">Line #{{ line }}:
-                    <span v-if="1 === errorList.length"> {{ errorList[0] }}</span>
+                    <span v-if="1 === errorList.length" v-html="errorList[0]"></span>
                     <ul v-if="errorList.length > 1">
-                        <li v-for="(error) in errorList"> ({{ errorList.length }}) {{ error }}</li>
+                        <li v-for="(error) in errorList" v-html="'(' + errorList.length + ')' + error"/>
                     </ul>
                 </li>
             </ul>
@@ -36,9 +36,9 @@
             <strong class="text-warning">Warning(s)</strong>
             <ul>
                 <li v-for="(warningList, line) in this.warnings">Line #{{ line }}:
-                    <span v-if="1 === warningList.length"> {{ warningList[0] }}</span>
+                    <span v-if="1 === warningList.length" v-html="warningList[0]"></span>
                     <ul v-if="warningList.length > 1">
-                        <li v-for="(warning) in warningList">({{ warningList.length }}) {{ warning }}</li>
+                        <li v-for="(warning) in warningList">X ({{ warningList.length }}) {{ warning }}</li>
                     </ul>
                 </li>
             </ul>
