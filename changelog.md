@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.7.0 - 2021-10-10
+
+### Deprecated
+- The CSV importer requires Firefly III 5.6.0 or higher.
+
+### Fixed
+- [Issue 5047](https://github.com/firefly-iii/firefly-iii/issues/5047) When importing using large configuration files, the importer would only save the top ~400 mapping entries.
+
 ## 2.6.1 - 2020-09-04
 
 ### Changed
