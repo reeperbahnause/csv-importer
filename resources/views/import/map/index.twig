@@ -20,6 +20,9 @@
                     instance. Be sure to <a target="_blank" href="https://docs.firefly-iii.org/csv/usage/map/">check out the documentation</a>, because this is where
                     the magic happens.
                 </p>
+                <p class="text-info">
+                    Account names with "lots&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;&nbsp;spaces" may seemingly lose those spaces. Fear not, those will be perfectly preserved.
+                </p>
                 {% if not errors.isEmpty %}
                     <p class="text-danger">Some error(s) occurred:</p>
                     <ul>
@@ -44,7 +47,7 @@
                                     {% for valueIndex, value in row.values %}
                                         <tr>
                                             <td>
-                                                <code>{{ value }}</code>
+                                                <pre style="color:#e83e8c;">{{ value }}</pre>
                                                 <input type="hidden" name="values[{{ index }}][{{ loop.index0 }}]" value="{{ value }}" />
                                             </td>
                                             <td>
