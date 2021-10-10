@@ -24,6 +24,8 @@ declare(strict_types=1);
 namespace App\Services\Storage;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use JsonException;
+use Log;
 use Storage;
 use Str;
 use UnexpectedValueException;
@@ -43,6 +45,23 @@ class StorageService
         $fileName = Str::random(20);
         $disk     = Storage::disk('uploads');
         $disk->put($fileName, $content);
+        Log::debug(sprintf('storeContent: Stored %d bytes in file "%s"', strlen($content), $fileName));
+
+        return $fileName;
+    }
+
+    /**
+     * @param array $array
+     * @return string
+     * @throws JsonException
+     */
+    public static function storeArray(array $array): string
+    {
+        $fileName = Str::random(20);
+        $disk     = Storage::disk('uploads');
+        $json     = json_encode($array, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 256);
+        $disk->put($fileName, $json);
+        Log::debug(sprintf('storeArray: Stored %d bytes in file "%s"', strlen($json), $fileName));
 
         return $fileName;
     }

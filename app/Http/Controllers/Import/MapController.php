@@ -65,12 +65,21 @@ class MapController extends Controller
     {
         $mainTitle = 'Map data';
         $subTitle  = 'Map values in CSV file to actual data in Firefly III';
-
         Log::debug('Now in mapController index');
 
-
         // get configuration object.
-        $configuration   = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+        $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+
+        // the config in the session will miss important values, we must get those from disk:
+        // 'mapping', 'do_mapping', 'roles' are missing.
+        $diskArray  = json_decode(StorageService::getContent(session()->get(Constants::UPLOAD_CONFIG_FILE)), true, JSON_THROW_ON_ERROR);
+        $diskConfig = Configuration::fromArray($diskArray);
+
+        $configuration->setMapping($diskConfig->getMapping());
+        $configuration->setDoMapping($diskConfig->getDoMapping());
+        $configuration->setRoles($diskConfig->getRoles());
+
+        // then we can use them:
         $roles           = $configuration->getRoles();
         $existingMapping = $configuration->getMapping();
         $doMapping       = $configuration->getDoMapping();
@@ -108,7 +117,7 @@ class MapController extends Controller
             $info['mapping_data'] = $object->getMap();
             $info['mapped']       = $existingMapping[$index] ?? [];
 
-            Log::debug(sprintf('Mapping data length is %d', count($info['mapping_data'])), $info['mapping_data']);
+            Log::debug(sprintf('Mapping data length is %d', count($info['mapping_data'])));
 
             $data[$index] = $info;
         }
@@ -128,11 +137,12 @@ class MapController extends Controller
      */
     public function postIndex(Request $request): RedirectResponse
     {
-        $values        = $request->get('values') ?? [];
-        $mapping       = $request->get('mapping') ?? [];
-        $values        = !is_array($values) ? [] : $values;
-        $mapping       = !is_array($mapping) ? [] : $mapping;
-        $data          = [];
+        $values  = $request->get('values') ?? [];
+        $mapping = $request->get('mapping') ?? [];
+        $values  = !is_array($values) ? [] : $values;
+        $mapping = !is_array($mapping) ? [] : $mapping;
+        $data    = [];
+
         $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
 
         /**
@@ -156,14 +166,63 @@ class MapController extends Controller
 
             }
         }
-        $configuration->setMapping($data);
+
+        // at this point the $data array must be merged with the mapping as it is on the disk,
+        // and then saved to disk once again in a new config file.
+        $diskArray       = json_decode(StorageService::getContent(session()->get(Constants::UPLOAD_CONFIG_FILE)), true, JSON_THROW_ON_ERROR);
+        $diskConfig      = Configuration::fromArray($diskArray);
+        $originalMapping = $diskConfig->getMapping();
+
+        // loop $data and save values:
+        $mergedMapping = $this->mergeMapping($originalMapping, $data);
+
+        $configuration->setMapping($mergedMapping);
 
         // store mapping in config object ( + session)
-        session()->put(Constants::CONFIGURATION, $configuration->toArray());
+        session()->put(Constants::CONFIGURATION, $configuration->toSessionArray());
+
+        // since the configuration saved in the session will omit 'mapping', 'do_mapping' and 'roles'
+        // these must be set to the configuration file
+        // no need to do this sooner because toSessionArray would have dropped them anyway.
+        $configuration->setRoles($diskConfig->getRoles());
+        $configuration->setDoMapping($diskConfig->getDoMapping());
+
+        // then save entire thing to a new disk file:
+        $configFileName = StorageService::storeArray($configuration->toArray());
+        Log::debug(sprintf('Old configuration was stored under key "%s".', session()->get(Constants::UPLOAD_CONFIG_FILE)));
+
+        session()->put(Constants::UPLOAD_CONFIG_FILE, $configFileName);
+
+        Log::debug(sprintf('New configuration is stored under key "%s".', session()->get(Constants::UPLOAD_CONFIG_FILE)));
 
         // set map config as complete.
         session()->put(Constants::MAPPING_COMPLETE_INDICATOR, true);
 
         return redirect()->route('import.run.index');
+    }
+
+    /**
+     * @param array $original
+     * @param array $new
+     * @return array
+     */
+    private function mergeMapping(array $original, array $new): array
+    {
+        Log::debug('Now merging disk mapping with new mapping');
+        foreach ($new as $column => $mappedValues) {
+            Log::debug(sprintf('Now working on column "%s"', $column));
+            if (array_key_exists($column, $original)) {
+                foreach ($mappedValues as $name => $value) {
+                    Log::debug(sprintf('Updated mapping of "%s" to ID "%s"', $name, $value));
+                    $original[$column][$name] = $value;
+                }
+            }
+            if (!array_key_exists($column, $original)) {
+                Log::debug('The original mapping has no map data for this column. We will set it now.');
+                $original[$column] = $mappedValues;
+            }
+        }
+        // original has been updated:
+        return $original;
     }
 }

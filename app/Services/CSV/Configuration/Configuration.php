@@ -116,9 +116,9 @@ class Configuration
         $object->rules          = $array['rules'];
         $object->skipForm       = $array['skip_form'];
         $object->addImportTag   = $array['add_import_tag'] ?? true;
-        $object->roles          = $array['roles'];
-        $object->mapping        = $array['mapping'];
-        $object->doMapping      = $array['do_mapping'];
+        $object->roles          = $array['roles'] ?? [];
+        $object->mapping        = $array['mapping'] ?? [];
+        $object->doMapping      = $array['do_mapping'] ?? [];
 
         // duplicate transaction detection
         $object->duplicateDetectionMethod = $array['duplicate_detection_method'] ?? 'classic';
@@ -153,7 +153,7 @@ class Configuration
      */
     public static function fromFile(array $data): self
     {
-        Log::debug('Now in Configuration::fromFile', $data);
+        Log::debug('Now in Configuration::fromFile. Data is omitted and will not be printed.');
         $version = $data['version'] ?? 1;
         if (1 === $version) {
             Log::debug('v1, going for classic.');
@@ -279,9 +279,9 @@ class Configuration
         $object->skipForm       = $array['skip_form'];
         $object->addImportTag   = $array['add_import_tag'] ?? true;
         $object->specifics      = $array['specifics'];
-        $object->roles          = $array['roles'];
+        $object->roles          = $array['roles'] ?? [];
         $object->mapping        = $array['mapping'] ?? [];
-        $object->doMapping      = $array['do_mapping'];
+        $object->doMapping      = $array['do_mapping'] ?? [];
         $object->version        = $version;
 
         // duplicate transaction detection
@@ -322,8 +322,8 @@ class Configuration
             $object->specifics = $actualSpecifics;
         }
 
-        Log::debug(var_export($object->ignoreDuplicateLines, true));
-        Log::debug(var_export($object->ignoreDuplicateTransactions, true));
+        //Log::debug(var_export($object->ignoreDuplicateLines, true));
+        //Log::debug(var_export($object->ignoreDuplicateTransactions, true));
 
         return $object;
     }
@@ -384,6 +384,17 @@ class Configuration
     public function isIgnoreDuplicateTransactions(): bool
     {
         return $this->ignoreDuplicateTransactions;
+    }
+
+    /**
+     * Return the array but drop some potentially massive arrays.
+     * @return array
+     */
+    public function toSessionArray(): array
+    {
+        $array = $this->toArray();
+        unset($array['mapping'], $array['do_mapping'], $array['roles']);
+        return $array;
     }
 
     /**
@@ -490,7 +501,12 @@ class Configuration
      */
     public function setMapping(array $mapping): void
     {
-        $this->mapping = $mapping;
+        $newMap = [];
+        foreach($mapping as $column => $map) {
+            ksort($map);
+            $newMap[$column] = $map;
+        }
+        $this->mapping = $newMap;
     }
 
     /**

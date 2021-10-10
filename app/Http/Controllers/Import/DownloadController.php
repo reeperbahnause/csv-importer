@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Import;
 use App\Http\Controllers\Controller;
 use App\Services\CSV\Configuration\Configuration;
 use App\Services\Session\Constants;
+use App\Services\Storage\StorageService;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
 
@@ -41,8 +42,18 @@ class DownloadController extends Controller
     public function download()
     {
         // do something
-        $config = Configuration::fromArray(session()->get(Constants::CONFIGURATION))->toArray();
-        $result = json_encode($config, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 512);
+        $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+
+        // append the config file with values from the disk:
+        $diskArray  = json_decode(StorageService::getContent(session()->get(Constants::UPLOAD_CONFIG_FILE)), true, JSON_THROW_ON_ERROR);
+        $diskConfig = Configuration::fromArray($diskArray);
+
+        $configuration->setRoles($diskConfig->getRoles());
+        $configuration->setMapping($diskConfig->getMapping());
+        $configuration->setDoMapping($diskConfig->getDoMapping());
+        $array = $configuration->toArray();
+
+        $result = json_encode($array, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 512);
 
         $response = response($result);
         $name     = sprintf('import_config_%s.json', date('Y-m-d'));

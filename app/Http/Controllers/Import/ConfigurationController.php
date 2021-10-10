@@ -110,22 +110,6 @@ class ConfigurationController extends Controller
             $accounts['Liabilities'][$account->id] = $account;
         }
 
-        // send other values through the form. A bit of a hack but OK.
-        $roles     = '{}';
-        $doMapping = '{}';
-        $mapping   = '{}';
-        if (null !== $configuration) {
-            try {
-                $roles     = base64_encode(json_encode($configuration->getRoles(), JSON_THROW_ON_ERROR, 512));
-                $doMapping = base64_encode(json_encode($configuration->getDoMapping(), JSON_THROW_ON_ERROR, 512));
-                $mapping   = base64_encode(json_encode($configuration->getMapping(), JSON_THROW_ON_ERROR, 512));
-            } catch (JsonException $e) {
-                Log::error($e->getMessage());
-                $roles     = base64_encode('[]');
-                $doMapping = base64_encode('[]');
-                $mapping   = base64_encode('[]');
-            }
-        }
         // created default configuration object for sensible defaults:
         if (null === $configuration) {
             $configuration = Configuration::make();
@@ -133,7 +117,7 @@ class ConfigurationController extends Controller
 
         return view(
             'import.configuration.index',
-            compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration', 'roles', 'mapping', 'doMapping')
+            compact('mainTitle', 'subTitle', 'accounts', 'specifics', 'configuration')
         );
     }
 
@@ -173,8 +157,7 @@ class ConfigurationController extends Controller
         }
         StorageService::storeContent($json);
 
-
-        session()->put(Constants::CONFIGURATION, $configuration->toArray());
+        session()->put(Constants::CONFIGURATION, $configuration->toSessionArray());
 
         // set config as complete.
         session()->put(Constants::CONFIG_COMPLETE_INDICATOR, true);

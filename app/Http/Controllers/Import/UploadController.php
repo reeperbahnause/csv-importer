@@ -108,7 +108,7 @@ class UploadController extends Controller
                 // process the config file
                 try {
                     $configuration = ConfigFileProcessor::convertConfigFile($configFileName);
-                    session()->put(Constants::CONFIGURATION, $configuration->toArray());
+                    session()->put(Constants::CONFIGURATION, $configuration->toSessionArray());
                 } catch (ImportException $e) {
                     $errors->add('config_file', $e->getMessage());
                 }
@@ -127,7 +127,7 @@ class UploadController extends Controller
             // process the config file
             try {
                 $configuration = ConfigFileProcessor::convertConfigFile($configFileName);
-                session()->put(Constants::CONFIGURATION, $configuration->toArray());
+                session()->put(Constants::CONFIGURATION, $configuration->toSessionArray());
             } catch (ImportException $e) {
                 $errors->add('config_file', $e->getMessage());
             }

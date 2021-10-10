@@ -165,6 +165,10 @@ class RoleService
                 $examples[$index]   = array_unique($examples[$index]);
             }
         }
+        foreach($examples as $line => $entries) {
+            asort($entries);
+            $examples[$line] = $entries;
+        }
 
         return $examples;
     }

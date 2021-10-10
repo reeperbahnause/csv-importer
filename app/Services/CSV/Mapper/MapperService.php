@@ -51,6 +51,7 @@ class MapperService
      */
     public static function getMapData(string $content, string $delimiter, bool $hasHeaders, array $specifics, array $data): array
     {
+        Log::debug('Now in getMapData');
         // make file reader first.
         $reader = Reader::createFromString($content);
 
@@ -75,6 +76,7 @@ class MapperService
             throw new ImportException($e->getMessage());
         }
         // loop each row, apply specific:
+        Log::debug('Going to loop all records to collect information');
         foreach ($records as $row) {
             $row = SpecificService::runSpecifics($row, $specifics);
             // loop each column, put in $data
@@ -90,25 +92,28 @@ class MapperService
         }
         // loop data, clean up data:
         foreach ($data as $index => $columnInfo) {
-            $data[$index]['values'] = array_unique($data[$index]['values']);
-            asort($data[$index]['values']);
-
+            $data[$index]['values'] = array_unique($columnInfo['values']);
+            sort($data[$index]['values']);
 
             /*
-             * The config may contain mapped values that arent in this CSV file. They're submitted as
+             * The config may contain mapped values that aren't in this CSV file. They're saved as
              * hidden values (under unused_maps).
+             *
+             * Change on 2021-10-10: These unused_maps are no longer saved or use.
+             * The original mapping (saved on disk) will be merged with the new mapping (submitted by the user)
             */
-            $mappedValues  = array_keys($columnInfo['mapped'] ?? []);
-            $foundValues   = $columnInfo['values'] ?? [];
-            $missingValues = array_diff($mappedValues, $foundValues);
-            // get them from mapped.
-            $missingMap = [];
-            foreach ($missingValues as $missingValue) {
-                if (array_key_exists($missingValue, $columnInfo['mapped'])) {
-                    $missingMap[$missingValue] = $columnInfo['mapped'][$missingValue];
-                }
-            }
-            $data[$index]['missing_map'] = $missingMap;
+
+//            $mappedValues  = array_keys($columnInfo['mapped'] ?? []);
+//            $foundValues   = $columnInfo['values'] ?? [];
+//            $missingValues = array_diff($mappedValues, $foundValues);
+//            // get them from mapped.
+//            $missingMap = [];
+//            foreach ($missingValues as $missingValue) {
+//                if (array_key_exists($missingValue, $columnInfo['mapped'])) {
+//                    $missingMap[$missingValue] = $columnInfo['mapped'][$missingValue];
+//                }
+//            }
+//            $data[$index]['missing_map'] = $missingMap;
         }
 
         return $data;

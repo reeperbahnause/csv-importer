@@ -62,7 +62,7 @@ class LineProcessor
         //array $roles, array $mapping, array $doMapping
         Log::debug('Created LineProcessor()');
         Log::debug('Roles', $configuration->getRoles());
-        Log::debug('Mapping', $configuration->getMapping());
+        Log::debug('Mapping (will not be printed)');
         $this->roles      = $configuration->getRoles();
         $this->mapping    = $configuration->getMapping();
         $this->doMapping  = $configuration->getDoMapping();
@@ -128,7 +128,7 @@ class LineProcessor
             $mapped = $this->mapping[$columnIndex][$value] ?? 0;
             Log::debug(sprintf('ColumnIndex is %s', var_export($columnIndex, true)));
             Log::debug(sprintf('Value is %s', var_export($value, true)));
-            Log::debug('Local mapping', $this->mapping[$columnIndex] ?? ['empty']);
+            Log::debug('Local mapping (will not be printed)');
             // the role might change because of the mapping.
             $role        = $this->getRoleForColumn($columnIndex, $mapped);
             $appendValue = config(sprintf('csv_importer.import_roles.%s.append_value', $originalRole));

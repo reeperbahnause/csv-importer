@@ -34,6 +34,7 @@ use App\Services\Import\ImportJobStatus\ImportJobStatus;
 use App\Services\Import\ImportJobStatus\ImportJobStatusManager;
 use App\Services\Import\ImportRoutineManager;
 use App\Services\Session\Constants;
+use App\Services\Storage\StorageService;
 use ErrorException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,17 +65,30 @@ class RunController extends Controller
      */
     public function index()
     {
+        Log::debug(sprintf('Now in %s', __METHOD__));
         $mainTitle = 'Import the data';
         $subTitle  = 'Connect to Firefly III and store your data';
 
         // get configuration object.
         $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+
+        // append info from the file on disk:
+        $diskArray  = json_decode(StorageService::getContent(session()->get(Constants::UPLOAD_CONFIG_FILE)), true, JSON_THROW_ON_ERROR);
+        $diskConfig = Configuration::fromArray($diskArray);
+
+        $configuration->setDoMapping($diskConfig->getDoMapping());
+        $configuration->setMapping($diskConfig->getMapping());
+
+
+        Log::debug('Will now verify configuration content.');
         if ([] === $configuration->getDoMapping()) {
             // no mapping, back to roles
+            Log::debug('NO role info in config, will send you back to roles..');
             $jobBackUrl = route('back.roles');
         }
-        if ([] !== $configuration->getDoMapping()) {
+        if ([] !== $configuration->getMapping()) {
             // back to mapping
+            Log::debug('NO mapping in file, will send you back to mapping..');
             $jobBackUrl = route('back.mapping');
         }
 
@@ -105,12 +119,21 @@ class RunController extends Controller
         $identifier = $request->get('identifier');
         $routine    = new ImportRoutineManager($identifier);
 
-
         $importJobStatus = ImportJobStatusManager::startOrFindJob($identifier);
         ImportJobStatusManager::setJobStatus(ImportJobStatus::JOB_RUNNING);
 
         try {
-            $routine->setConfiguration(Configuration::fromArray(session()->get(Constants::CONFIGURATION)));
+            // read configuration from session
+            $configuration = Configuration::fromArray(session()->get(Constants::CONFIGURATION));
+
+            // read configuration from disk (to append data)
+            $diskArray  = json_decode(StorageService::getContent(session()->get(Constants::UPLOAD_CONFIG_FILE)), true, JSON_THROW_ON_ERROR);
+            $diskConfig = Configuration::fromArray($diskArray);
+            $configuration->setMapping($diskConfig->getMapping());
+            $configuration->setDoMapping($diskConfig->getDoMapping());
+            $configuration->setRoles($diskConfig->getRoles());
+
+            $routine->setConfiguration($configuration);
             $routine->setReader(FileReader::getReaderFromSession());
             $routine->start();
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (ImportException | ErrorException | TypeError $e) {

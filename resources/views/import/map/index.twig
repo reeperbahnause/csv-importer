@@ -74,11 +74,6 @@
                                     {% endfor %}
                                 </table>
                                 <!-- final count is {{ finalCount }} -->
-                                {% for value, mappedValue in row.missing_map %}
-                                    <!-- missing field thing  ({{ loop.index0 }})-->
-                                    <input type="hidden" name="values[{{ index }}][{{ finalCount + loop.index0 }}]" value="{{ value }}" />
-                                    <input type="hidden" name="mapping[{{ index }}][{{ finalCount + loop.index0 }}]" value="{{ mappedValue }}" />
-                                {% endfor %}
                             {% endfor %}
                             <p>
                                 &nbsp;
