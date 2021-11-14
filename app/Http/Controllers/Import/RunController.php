@@ -81,6 +81,7 @@ class RunController extends Controller
 
 
         Log::debug('Will now verify configuration content.');
+        $jobBackUrl = route('back.roles');
         if ([] === $configuration->getDoMapping()) {
             // no mapping, back to roles
             Log::debug('NO role info in config, will send you back to roles..');
