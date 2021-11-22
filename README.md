@@ -27,17 +27,18 @@
 <!-- MarkdownTOC autolink="true" -->
 
 - [About the Firefly III CSV importer](#about-the-firefly-iii-csv-importer)
-	- [Purpose](#purpose)
-	- [Features](#features)
-	- [Who's it for?](#whos-it-for)
+  - [Purpose](#purpose)
+  - [Features](#features)
+  - [Who's it for?](#whos-it-for)
 - [Getting Started](#getting-started)
-	- [Using the web interface](#using-the-web-interface)
-	- [Using the auto-import](#using-the-auto-import)
+  - [Using the web interface](#using-the-web-interface)
+  - [Using the command line](#using-the-command-line)
+  - [Using the auto-import](#using-the-auto-import)
 - [Known import challenges](#known-import-challenges)
 - [Other stuff](#other-stuff)
-	- [Contribute](#contribute)
-	- [Support the development of Firefly III](#support-the-development-of-firefly-iii)
-	- [Contact](#contact)
+  - [Contribute](#contribute)
+  - [Donate](#donate)
+  - [Contact](#contact)
 
 <!-- /MarkdownTOC -->
 
@@ -108,30 +109,27 @@ Most people run into the same problems when importing data into Firefly III. Rea
 
 ### Contribute
 
-Your help is always welcome! Feel free to open issues in [the main Firefly III repository](https://github.com/firefly-iii/firefly-iii/issues), ask questions, talk about it and discuss this tool. You can also join [reddit](https://www.reddit.com/r/FireflyIII/) or follow me on [Twitter](https://twitter.com/Firefly_III).
-
-Of course, there are some [contributing guidelines](https://github.com/firefly-iii/csv-importer/blob/master/.github/contributing.md) and a [code of conduct](https://github.com/firefly-iii/csv-importer/blob/master/.github/code_of_conduct.md), which I invite you to check out.
+There are some [contributing guidelines](https://github.com/firefly-iii/csv-importer/blob/master/.github/contributing.md) and a [code of conduct](https://github.com/firefly-iii/csv-importer/blob/master/.github/code_of_conduct.md), which I invite you to check out.
 
 For all other contributions, see below.
 
-### Support the development of Firefly III
+<!-- SPONSOR TEXT -->
+### Donate
 
-If you like this tool and if it helps you save lots of money, why not send me a dime for every dollar saved!
+If you feel Firefly III made your life better, consider contributing as a sponsor. Please check out my [Patreon](https://www.patreon.com/jc5) and [GitHub Sponsors](https://github.com/sponsors/JC5) page for more information. Thank you for considering.
 
-OK that was a joke. You can donate using [Patreon](https://www.patreon.com/jc5) or the [GitHub Sponsors Program](https://github.com/sponsors/JC5).
+
+<!-- END OF SPONSOR -->
 
 This work [is licensed](https://github.com/firefly-iii/csv-importer/blob/master/LICENSE) under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.html).
 
 ### Contact
 
-You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you may open an issue in the [main repository](https://github.com/firefly-iii/firefly-iii) or contact me through the various social media pages there are: [reddit](https://www.reddit.com/r/FireflyIII/) and [Twitter](https://twitter.com/Firefly_III).
+You can contact me at [james@firefly-iii.org](mailto:james@firefly-iii.org), you may open an issue in the [main repository](https://github.com/firefly-iii/firefly-iii) or contact me through [gitter](https://gitter.im/firefly-iii/firefly-iii) and [Twitter](https://twitter.com/Firefly_III).
 
-[![Scrutinizer][scrutinizer-shield]][scrutinizer-uri]
-[![Requires PHP7.4][php-shield]][php-uri]
+[![Requires PHP8.0][php-shield]][php-uri]
 
-[scrutinizer-shield]: https://img.shields.io/scrutinizer/g/firefly-iii/csv-importer.svg?style=flat-square
-[scrutinizer-uri]: https://scrutinizer-ci.com/g/firefly-iii/csv-importer/
-[php-shield]: https://img.shields.io/badge/php-7.4-red.svg?style=flat-square
+[php-shield]: https://img.shields.io/badge/php-8.0-red.svg?style=flat-square
 [php-uri]: https://secure.php.net/downloads.php
 [packagist-shield]: https://img.shields.io/packagist/v/firefly-iii/csv-importer.svg?style=flat-square
 [packagist-uri]: https://packagist.org/packages/firefly-iii/csv-importer
