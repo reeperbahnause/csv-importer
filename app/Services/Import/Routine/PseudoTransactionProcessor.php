@@ -141,7 +141,8 @@ class PseudoTransactionProcessor
         $processed = [];
         Log::info(sprintf('Converting %d lines into transactions.', $count));
         /** @var array $line */
-        foreach ($lines as $line) {
+        foreach ($lines as $index => $line) {
+            Log::info(sprintf('Now processing line %d/%d.', ($index + 1), $count));
             $processed[] = $this->processPseudoLine($line);
         }
         Log::info(sprintf('Done converting %d lines into transactions.', $count));

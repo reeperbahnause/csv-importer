@@ -166,6 +166,7 @@ class Accounts extends AbstractTask
             'iban'             => $transaction['source_iban'] ?? null,
             'number'           => $transaction['source_number'] ?? null,
             'bic'              => $transaction['source_bic'] ?? null,
+            'direction'        => 'source',
         ];
     }
 
@@ -183,6 +184,7 @@ class Accounts extends AbstractTask
             'iban'             => $transaction['destination_iban'] ?? null,
             'number'           => $transaction['destination_number'] ?? null,
             'bic'              => $transaction['destination_bic'] ?? null,
+            'direction'        => 'destination',
         ];
     }
 
@@ -229,6 +231,10 @@ class Accounts extends AbstractTask
 
             return $return;
         }
+        // If the IBAN search result is NULL, but the IBAN itself is not null,
+        // CSV importer will return an array with the IBAN (and optionally the name).
+        // this prevents a situation where the CSV importer
+
 
         // find by name, return only if it's an asset or liability account.
         if (isset($array['name']) && '' !== (string) $array['name']) {
@@ -249,8 +255,15 @@ class Accounts extends AbstractTask
         $array['bic']  = $array['bic'] ?? null;
 
         // Return ID or name if not null
-        if (null !== $array['id'] || null !== $array['name']) {
-            Log::debug('Array with account has some info, return that.', $array);
+        if (null !== $array['id'] || '' !== (string)$array['name']) {
+            Log::debug('Array with account has some name info, return that.', $array);
+
+            return $array;
+        }
+
+        // Return ID or IBAN if not null
+        if (null !== $array['id'] || '' !== (string)$array['iban']) {
+            Log::debug('Array with account has some IBAN info, return that.', $array);
 
             return $array;
         }
@@ -357,12 +370,13 @@ class Accounts extends AbstractTask
             }
             Log::debug(sprintf('[a] Found %s account #%d based on IBAN "%s"', $account->type, $account->id, $iban));
 
-            // to fix issue #4293, Firefly III will ignore this account if its an expense or a revenue account.
+            // to fix issue #4293, Firefly III will ignore this account if it's an expense or a revenue account.
             if (in_array($account->type, ['expense', 'revenue'], true)) {
                 Log::debug('[a] CSV importer will pretend not to have found anything. Firefly III must handle the IBAN.');
 
                 return null;
             }
+
 
             return $account;
         }

@@ -68,7 +68,8 @@ class ColumnValueConverter
         $processed = [];
         $count     = count($lines);
         Log::info(sprintf('Now parsing and combining %d lines.', $count));
-        foreach ($lines as $line) {
+        foreach ($lines as $index => $line) {
+            Log::debug(sprintf('Now processing line %d/%d', ($index+1), $count));
             $processed[] = $this->processValueArray($line);
         }
         Log::info(sprintf('Done parsing and combining %d lines.', $count));

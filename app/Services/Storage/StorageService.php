@@ -42,8 +42,13 @@ class StorageService
      */
     public static function storeContent(string $content): string
     {
-        $fileName = Str::random(20);
+        $fileName = hash('sha256', $content);
         $disk     = Storage::disk('uploads');
+
+        if($disk->has($fileName)) {
+            Log::warning(sprintf('Have already stored a file under key "%s", so the content is unchanged from last time.', $fileName));
+        }
+
         $disk->put($fileName, $content);
         Log::debug(sprintf('storeContent: Stored %d bytes in file "%s"', strlen($content), $fileName));
 
@@ -57,9 +62,14 @@ class StorageService
      */
     public static function storeArray(array $array): string
     {
-        $fileName = Str::random(20);
         $disk     = Storage::disk('uploads');
         $json     = json_encode($array, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT, 256);
+        $fileName = hash('sha256', $json);
+
+        if($disk->has($fileName)) {
+            Log::warning(sprintf('Have already stored a file under key "%s", so the content is unchanged from last time.', $fileName));
+        }
+
         $disk->put($fileName, $json);
         Log::debug(sprintf('storeArray: Stored %d bytes in file "%s"', strlen($json), $fileName));
 

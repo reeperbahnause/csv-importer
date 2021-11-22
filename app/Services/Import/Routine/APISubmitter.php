@@ -74,11 +74,16 @@ class APISubmitter
          * @var array $line
          */
         foreach ($lines as $index => $line) {
-
+            Log::debug(sprintf('Now submitting transaction %d/%d', ($index+1), $count));
             // first do local duplicate transaction check (the "cell" method):
-            if (true === $this->uniqueTransaction($index, $line)) {
+            $unique = $this->uniqueTransaction($index, $line);
+            if (true === $unique) {
+                Log::debug(sprintf('Transaction #%d is unique.', $index+1));
                 $groupInfo = $this->processTransaction($index, $line);
                 $this->addTagToGroups($groupInfo);
+            }
+            if(false === $unique) {
+                Log::debug(sprintf('Transaction #%d is NOT unique.', $index+1));
             }
         }
         Log::info(sprintf('Done submitting %d transactions to your Firefly III instance.', $count));
